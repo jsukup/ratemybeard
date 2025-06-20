@@ -19,7 +19,6 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/lib/supabase";
 import { AdContainer } from "@/components/AdScriptFixed";
 
@@ -34,9 +33,6 @@ const isSupabaseConfigured =
   process.env.NEXT_PUBLIC_SUPABASE_URL && 
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// Define base URL for API calls
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || '';
-
 // Custom spinner component
 function Spinner({ className }: { className?: string }) {
   return (
@@ -46,52 +42,17 @@ function Spinner({ className }: { className?: string }) {
 
 // Wrap the main content in a separate component to use hooks
 function HomeContent() {
-  // Removed useModel dependency since we're using server-side prediction
   const [hasImage, setHasImage] = useState(false);
   const [currentImage, setCurrentImage] = useState<string | null>(null);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [score, setScore] = useState<number | null>(null);
-  const [scoreScale, setScoreScale] = useState<number>(5); // Default to 5-point scale
   const [error, setError] = useState<string | null>(null);
   const [showDialog, setShowDialog] = useState(false);
   const [screenName, setScreenName] = useState("");
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [progressValue, setProgressValue] = useState(0);
-  const [progressInterval, setProgressInterval] = useState<NodeJS.Timeout | null>(null);
-  const [activeTab, setActiveTab] = useState("analyze");
+  const [activeTab, setActiveTab] = useState("upload");
   const [submittedEntryId, setSubmittedEntryId] = useState<number | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
-  const [modelsPreloaded, setModelsPreloaded] = useState(false);
 
-  // Preload models when the component mounts
-  useEffect(() => {
-    // Function to preload models
-    const preloadModels = async () => {
-      try {
-        console.log('Initiating model preloading...');
-        const response = await fetch(`${BASE_URL}/api/ensemble`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          console.log('Model preloading initiated:', result);
-          setModelsPreloaded(true);
-        } else {
-          console.warn('Failed to initiate model preloading');
-        }
-      } catch (error) {
-        console.error('Error initiating model preload:', error);
-      }
-    };
-
-    // Call the preload function
-    preloadModels();
-  }, []);
 
   // Function to ensure the 'images' bucket exists
   const ensureImagesBucketExists = async () => {
@@ -123,139 +84,12 @@ function HomeContent() {
   const handleImageCapture = (image: string | null) => {
     setHasImage(!!image);
     setCurrentImage(image);
-    setScore(null);
     setError(null);
-  };
-
-  const handleAnalyze = async () => {
-    if (!currentImage) return;
-    
-    setAnalyzing(true);
-    setProgressValue(0);
-    setError(null);
-    
-    // Start progress animation
-    const interval = setInterval(() => {
-      setProgressValue((prev) => {
-        const newValue = prev + Math.random() * 10;
-        return newValue > 90 ? 90 : newValue;
-      });
-    }, 300);
-    
-    setProgressInterval(interval);
-    
-    try {
-      // Set a client-side timeout for the entire operation (35 seconds)
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 35000); // 35 seconds to account for network latency
-      
-      // First check model status if we haven't confirmed preloading
-      if (!modelsPreloaded) {
-        try {
-          const checkResponse = await fetch('/api/ensemble', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            }
-          });
-          
-          if (checkResponse.ok) {
-            setModelsPreloaded(true);
-          }
-        } catch (checkError) {
-          console.warn('Failed to check model status:', checkError);
-        }
-      }
-      
-      // Use server-side API instead of client-side prediction
-      const response = await fetch(`${BASE_URL}/api/ensemble`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ image_data: currentImage }),
-        signal: controller.signal
-      }).catch(error => {
-        if (error.name === 'AbortError') {
-          throw new Error('Request timed out. The server took too long to respond. Please try again.');
-        }
-        throw error;
-      });
-      
-      // Clear the timeout
-      clearTimeout(timeoutId);
-      
-      // Check if the response is JSON before trying to parse it
-      const contentType = response.headers.get('content-type') || '';
-      if (!contentType.includes('application/json')) {
-        // Not JSON, get the text and log it
-        const textResponse = await response.text();
-        console.error('Received non-JSON response:', textResponse.substring(0, 150) + '...');
-        throw new Error('The server returned an invalid response format');
-      }
-      
-      // Now we can safely parse JSON
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to analyze image');
-      }
-      
-      // Clear the progress interval
-      if (progressInterval) {
-        clearInterval(progressInterval);
-        setProgressInterval(null);
-      }
-      
-      // Set progress to 100% to indicate completion
-      setProgressValue(100);
-      
-      // Check if this was a fallback result
-      const wasFallback = result._fallback === true;
-      
-      // Wait a moment for the progress to complete visually
-      setTimeout(() => {
-        setScore(result.ensemble_score);
-        setScoreScale(5); // Always using 5-point scale
-        setAnalyzing(false);
-        
-        // Show a warning if we used fallback
-        if (wasFallback) {
-          console.warn('Used fallback scores due to server timeout');
-          setError('Note: The analysis took longer than expected. For more accurate results, please try again.');
-        }
-      }, 1000);
-      
-    } catch (error) {
-      console.error('Error analyzing image:', error);
-      
-      // Clear the progress interval if it exists
-      if (progressInterval) {
-        clearInterval(progressInterval);
-        setProgressInterval(null);
-      }
-      
-      // Provide more specific error messages
-      let errorMessage = 'Failed to analyze image';
-      
-      if (error instanceof Error) {
-        if (error.message.includes('timed out') || error.message.includes('timeout')) {
-          errorMessage = 'The analysis took too long. Please try again or use a different photo.';
-        } else if (error.message.includes('network') || error.message.includes('fetch')) {
-          errorMessage = 'Network error. Please check your connection and try again.';
-        } else if (error.message.includes('format')) {
-          errorMessage = 'The server returned an invalid response. Please try again later.';
-        } else {
-          errorMessage = error.message;
-        }
-      }
-      
-      // Set error state
-      setError(errorMessage);
-      setAnalyzing(false);
-      setProgressValue(0);
+    if (image) {
+      setShowDialog(true);
     }
   };
+
 
   // Check if screen name is already taken
   const checkScreenNameExists = async (name: string) => {
@@ -387,18 +221,15 @@ function HomeContent() {
         const imageUrl = publicUrlData.publicUrl;
         
         // Insert entry into Supabase
-        console.log("Inserting entry with screen name:", screenName, "and score:", score);
+        console.log("Inserting entry with screen name:", screenName);
         
         try {
-          // With the database schema changed to accept decimals, we don't need to convert
-          
           const { data: insertData, error: insertError } = await supabase
-            .from('entries')
+            .from('images')
             .insert([
               {
                 user_id: 'anonymous', // In a real app, use actual user IDs if available
-                screen_name: screenName,
-                score: score, // Use the original decimal score
+                username: screenName,
                 image_url: imageUrl,
                 image_name: fileName,
                 is_visible: true
@@ -497,12 +328,12 @@ function HomeContent() {
             <div className="mx-auto mb-4 logo-animation">
               <img 
                 src="/mainlogo.png" 
-                alt="LooxMaxx Logo" 
+                alt="RateMyFeet Logo" 
                 className="h-24 mx-auto"
               />
             </div>
             <p className="text-xl text-white drop-shadow-lg font-semibold">
-              🤯 Just Like Hot or Not....But With AI! 🤯
+              🦶 Rate the attractiveness of feet! 🦶
             </p>
           </div>
 
@@ -521,7 +352,7 @@ function HomeContent() {
             <div className="col-span-1 lg:col-span-8">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="analyze">Analyze Photo</TabsTrigger>
+                  <TabsTrigger value="upload">Upload Photo</TabsTrigger>
                   <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
                 </TabsList>
                 
@@ -535,35 +366,8 @@ function HomeContent() {
                   />
                 </div>
 
-                <TabsContent value="analyze" className="mt-4 space-y-6">
+                <TabsContent value="upload" className="mt-4 space-y-6">
                   <Card className="p-4 sm:p-6">
-                    {hasImage && score !== null ? (
-                      <div className="flex flex-col items-center mb-6">
-                        <div className="text-center mb-8">
-                          <h2 className="text-2xl font-bold mb-2">Your Score: {typeof score === 'number' ? score.toFixed(2) : score}/{scoreScale}</h2>
-                          <p className="text-muted-foreground">
-                            Based on our AI analysis, your attractiveness score is {typeof score === 'number' ? score.toFixed(2) : score} out of {scoreScale}.
-                          </p>
-                        </div>
-                        
-                        <div className="flex gap-3 mt-6">
-                          <Button className="px-4" onClick={() => handleImageCapture(null)}>
-                            Take New Photo
-                          </Button>
-                          <Button onClick={() => setShowDialog(true)}>
-                            Add to Leaderboard
-                          </Button>
-                        </div>
-                      </div>
-                    ) : null}
-                    
-                    {analyzing && (
-                      <div className="mb-6">
-                        <p className="text-center mb-2">Analyzing your photo...</p>
-                        <Progress value={progressValue} className="h-2" />
-                      </div>
-                    )}
-                    
                     {error && (
                       <Alert variant="destructive" className="mb-6">
                         <AlertCircle className="h-4 w-4" />
@@ -571,21 +375,28 @@ function HomeContent() {
                       </Alert>
                     )}
                     
+                    <div className="text-center mb-6">
+                      <h2 className="text-2xl font-bold mb-2">Upload Your Photo</h2>
+                      <p className="text-muted-foreground">
+                        Take a photo to share with the community for rating.
+                      </p>
+                    </div>
+                    
                     <WebcamCaptureSimple onImageCapture={handleImageCapture} />
                     
-                    {hasImage && score === null && !analyzing && (
+                    {hasImage && (
                       <div className="flex justify-center mt-4">
-                        <Button className="px-8 py-2 h-11" onClick={handleAnalyze}>
-                          Analyze Photo
+                        <Button className="px-4" onClick={() => handleImageCapture(null)}>
+                          Take New Photo
                         </Button>
                       </div>
                     )}
                   </Card>
                   
-                  {/* Ad container at the bottom of the Analyze tab */}
+                  {/* Ad container at the bottom of the Upload tab */}
                   <AdContainer 
                     className="w-full h-28"
-                    adSlot="analyze-bottom-horizontal"
+                    adSlot="upload-bottom-horizontal"
                     adFormat="horizontal"
                     responsive={true}
                   />
@@ -614,7 +425,7 @@ function HomeContent() {
             <DialogHeader>
               <DialogTitle>Submit to Leaderboard</DialogTitle>
               <DialogDescription>
-                Submit your photo to the leaderboard. Your photo and score will be visible publicly.
+                Submit your photo to the leaderboard. Your photo will be visible publicly for rating.
               </DialogDescription>
             </DialogHeader>
             
@@ -667,7 +478,7 @@ function HomeContent() {
       <footer className="py-4 border-t border-gray-800 bg-black/30 backdrop-blur-sm w-full">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <p className="text-sm text-gray-400">&copy; 2025 looxmaxx. All Rights Reserved</p>
+            <p className="text-sm text-gray-400">&copy; 2025 RateMyFeet. All Rights Reserved</p>
           </div>
         </div>
       </footer>
@@ -675,9 +486,6 @@ function HomeContent() {
   );
 }
 
-// Main component wrapped with ModelProvider
 export default function Home() {
-  // We can still wrap with ModelProvider for fallback, but it's not strictly necessary
-  // since we're now using server-side prediction
   return <HomeContent />;
 }
