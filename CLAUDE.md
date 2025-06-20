@@ -114,8 +114,8 @@ When working on tasks across multiple worktrees, follow this workflow:
 
 #### Worktree Status
 - ✅ **ratemyfeet-cleanup** (Task 1) - **COMPLETED & PUSHED**
-- ⬜ **ratemyfeet-database** (Task 2) - Ready to start
-- ⬜ **ratemyfeet-rating** (Tasks 3-6) - Depends on Task 2
+- ✅ **ratemyfeet-database** (Task 2) - **COMPLETED & PUSHED** 
+- ⬜ **ratemyfeet-rating** (Tasks 3-6) - Ready to start (depends on Task 2)
 - ⬜ **ratemyfeet-users** (Tasks 7-10) - Depends on Tasks 3-6
 - ⬜ **ratemyfeet-branding** (Task 11) - Can run in parallel
 - ⬜ **ratemyfeet-errors** (Task 12) - Final integration work
