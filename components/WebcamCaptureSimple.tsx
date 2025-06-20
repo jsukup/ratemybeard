@@ -1,4 +1,3 @@
-// @ts-nocheck - Temporarily disable type checking for this file
 "use client";
 
 import * as React from "react";
@@ -12,15 +11,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import * as faceapi from '@vladmandic/face-api';
+import { supabase } from '@/lib/supabase';
+import UsernameInput from './UsernameInput';
 
-// Add a browser check to avoid server-side errors
-const isBrowser = typeof window !== 'undefined';
+// Utility function to convert data URL to File object
+function dataURLtoFile(dataurl: string, filename: string): File {
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  
+  return new File([u8arr], filename, { type: mime });
+}
 
 interface WebcamCaptureProps {
-  onImageCapture: (image: string | null) => void;
+  onImageCapture?: (image: string | null) => void;
+  onImageUploaded?: (imageData: { id: string; username: string; image_url: string }) => void;
 }
 
 interface VideoDevice {
@@ -28,60 +39,20 @@ interface VideoDevice {
   label: string;
 }
 
-export default function WebcamCaptureSimple({ onImageCapture }: WebcamCaptureProps) {
+export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded }: WebcamCaptureProps) {
   const [imgSrc, setImgSrc] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [hasPermission, setHasPermission] = React.useState<boolean | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [videoDevices, setVideoDevices] = React.useState<VideoDevice[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = React.useState<string>("");
-  const [faceDetected, setFaceDetected] = React.useState(false);
-  const [autoCapture, setAutoCapture] = React.useState(false);
-  const [countdown, setCountdown] = React.useState<number | null>(null);
   const [showGuide, setShowGuide] = React.useState(true);
   const [showFlash, setShowFlash] = React.useState(false);
-  const [modelsLoaded, setModelsLoaded] = React.useState(false);
+  const [showUsernameInput, setShowUsernameInput] = React.useState(false);
+  const [isUploading, setIsUploading] = React.useState(false);
   
   const webcamRef = React.useRef<Webcam | null>(null);
-  const videoRef = React.useRef<HTMLVideoElement | null>(null);
-  const streamRef = React.useRef<MediaStream | null>(null);
-  const detectionIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
-  const stableDetectionCount = React.useRef<number>(0);
-  const facePositionedTimeRef = React.useRef<number | null>(null);
-  const countdownIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  // Load face-api.js models
-  React.useEffect(() => {
-    // Only run in browser environment
-    if (!isBrowser) return;
-    
-    const loadModels = async () => {
-      setIsLoading(true);
-      try {
-        // Set the models path
-        const MODEL_URL = '/models';
-        
-        // Load the required models
-        await Promise.all([
-          faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-          faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-          faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
-        ]);
-        
-        console.log('Face detection models loaded successfully');
-        setModelsLoaded(true);
-      } catch (error) {
-        console.error('Error loading face detection models:', error);
-        setError('Failed to load face detection models. Using fallback detection.');
-        // Still set models as loaded to continue with fallback
-        setModelsLoaded(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadModels();
-  }, []);
 
   // Get available video devices
   async function getVideoDevices() {
@@ -113,25 +84,8 @@ export default function WebcamCaptureSimple({ onImageCapture }: WebcamCapturePro
 
   // Stop webcam stream
   function stopWebcam() {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-    
-    // Clear detection interval
-    if (detectionIntervalRef.current) {
-      clearInterval(detectionIntervalRef.current);
-      detectionIntervalRef.current = null;
-    }
-    
-    // Clear countdown interval
-    if (countdownIntervalRef.current) {
-      clearInterval(countdownIntervalRef.current);
-      countdownIntervalRef.current = null;
+    if (webcamRef.current?.stream) {
+      webcamRef.current.stream.getTracks().forEach(track => track.stop());
     }
   }
 
@@ -148,12 +102,6 @@ export default function WebcamCaptureSimple({ onImageCapture }: WebcamCapturePro
       if (videoDevices.length === 0) {
         await getVideoDevices();
       }
-      
-      // Reset face detection state
-      setFaceDetected(false);
-      stableDetectionCount.current = 0;
-      facePositionedTimeRef.current = null;
-      setCountdown(null);
       
       setHasPermission(true);
     } catch (err) {
@@ -174,14 +122,6 @@ export default function WebcamCaptureSimple({ onImageCapture }: WebcamCapturePro
     }
   }
 
-  // Toggle auto capture
-  function toggleAutoCapture() {
-    setAutoCapture(!autoCapture);
-    // Reset detection state when toggling
-    stableDetectionCount.current = 0;
-    facePositionedTimeRef.current = null;
-    setCountdown(null);
-  }
 
   // Capture photo with higher quality settings
   function capture() {
@@ -215,7 +155,7 @@ export default function WebcamCaptureSimple({ onImageCapture }: WebcamCapturePro
       
       if (screenshot) {
         setImgSrc(screenshot);
-        onImageCapture(screenshot);
+        onImageCapture?.(screenshot);
         
         // Stop the webcam after capturing
         stopWebcam();
@@ -234,216 +174,15 @@ export default function WebcamCaptureSimple({ onImageCapture }: WebcamCapturePro
   function retake() {
     setIsLoading(true);
     setImgSrc(null);
-    onImageCapture(null);
-    
-    // Reset face detection state
-    setFaceDetected(false);
-    stableDetectionCount.current = 0;
-    facePositionedTimeRef.current = null;
-    setCountdown(null);
+    onImageCapture?.(null);
+    setShowUsernameInput(false);
     
     // Re-initialize webcam
     initializeWebcam();
   }
 
-  // Check if face is properly positioned within the oval guide
-  const isFaceProperlyPositioned = (detection, videoWidth, videoHeight, guideWidth, guideHeight) => {
-    if (!detection) return false;
-    
-    // Get the face bounding box
-    const { box } = detection;
-    
-    // Calculate the center of the video
-    const videoCenter = {
-      x: videoWidth / 2,
-      y: videoHeight / 2
-    };
-    
-    // Calculate the center of the face
-    const faceCenter = {
-      x: box.x + box.width / 2,
-      y: box.y + box.height / 2
-    };
-    
-    // Calculate the distance from the center
-    const distanceX = Math.abs(faceCenter.x - videoCenter.x);
-    const distanceY = Math.abs(faceCenter.y - videoCenter.y);
-    
-    // Calculate the maximum allowed distance (half of the guide dimensions)
-    const maxDistanceX = guideWidth / 2 * 0.7; // 70% of the guide width
-    const maxDistanceY = guideHeight / 2 * 0.7; // 70% of the guide height
-    
-    // Check if the face is within the guide
-    const isWithinGuide = distanceX <= maxDistanceX && distanceY <= maxDistanceY;
-    
-    // Check if the face is not too small or too large
-    const minFaceSize = Math.min(guideWidth, guideHeight) * 0.3; // At least 30% of the guide
-    const maxFaceSize = Math.max(guideWidth, guideHeight) * 0.9; // At most 90% of the guide
-    const faceSize = Math.max(box.width, box.height);
-    
-    const isProperSize = faceSize >= minFaceSize && faceSize <= maxFaceSize;
-    
-    return isWithinGuide && isProperSize;
-  };
 
-  // Face detection logic
-  React.useEffect(() => {
-    if (imgSrc || !webcamRef.current || !modelsLoaded) return;
-    
-    // Only run auto-capture logic if enabled
-    const shouldAutoCapture = autoCapture;
-    
-    // Clear existing interval
-    if (detectionIntervalRef.current) {
-      clearInterval(detectionIntervalRef.current);
-    }
-    
-    // Start detection interval - check every 200ms
-    detectionIntervalRef.current = setInterval(async () => {
-      if (!webcamRef.current || !webcamRef.current.video) return;
-      
-      try {
-        const video = webcamRef.current.video;
-        
-        // Get video dimensions
-        const videoWidth = video.videoWidth;
-        const videoHeight = video.videoHeight;
-        
-        // Check if video dimensions are valid before proceeding
-        if (!videoWidth || !videoHeight || videoWidth === 0 || videoHeight === 0) {
-          console.log('Video dimensions not ready yet, skipping face detection');
-          return;
-        }
-        
-        // Calculate guide dimensions (40% width, 95% height of the video)
-        const guideWidth = videoWidth * 0.4;
-        const guideHeight = videoHeight * 0.95;
-        
-        // Detect faces
-        let isFaceDetected = false;
-        let isFaceCompletelyInOval = false;
-        
-        try {
-          // Use face-api.js to detect faces
-          const detections = await faceapi.detectAllFaces(
-            video, 
-            new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.5 })
-          );
-          
-          // Check if any face is detected
-          isFaceDetected = detections.length > 0;
-          
-          // Check if the face is properly positioned within the oval guide
-          if (isFaceDetected) {
-            // Use the largest face if multiple are detected
-            const largestFace = detections.reduce((prev, current) => 
-              (prev.box.width * prev.box.height > current.box.width * current.box.height) ? prev : current
-            );
-            
-            isFaceCompletelyInOval = isFaceProperlyPositioned(
-              largestFace, 
-              videoWidth, 
-              videoHeight, 
-              guideWidth, 
-              guideHeight
-            );
-          }
-        } catch (error) {
-          console.error('Face detection error:', error);
-          // Fallback to simulated detection if face-api.js fails
-          isFaceDetected = faceDetected 
-            ? Math.random() > 0.05  // 95% chance to maintain detection if already detected
-            : Math.random() > 0.9;  // 10% chance to detect initially
-          
-          isFaceCompletelyInOval = isFaceDetected && Math.random() > 0.6; // 40% chance if face is detected
-        }
-        
-        setFaceDetected(isFaceDetected);
-        
-        // Only proceed with countdown and auto-capture if enabled and face is completely in oval
-        if (shouldAutoCapture) {
-          if (isFaceDetected && isFaceCompletelyInOval) {
-            // Increment stable detection counter
-            stableDetectionCount.current += 1;
-            
-            // Start countdown only after 1 second (5 intervals of 200ms) of stable detection
-            if (stableDetectionCount.current >= 5 && countdown === null) {
-              setCountdown(3);
-            }
-          } else {
-            // Reset when face is no longer completely in oval
-            stableDetectionCount.current = 0;
-            
-            if (countdownIntervalRef.current) {
-              clearInterval(countdownIntervalRef.current);
-              countdownIntervalRef.current = null;
-            }
-            
-            setCountdown(null);
-          }
-        }
-      } catch (error) {
-        console.error("Face detection error:", error);
-      }
-    }, 200); // Check every 200ms for better performance
-    
-    return () => {
-      if (detectionIntervalRef.current) {
-        clearInterval(detectionIntervalRef.current);
-      }
-      if (countdownIntervalRef.current) {
-        clearInterval(countdownIntervalRef.current);
-      }
-    };
-  }, [autoCapture, faceDetected, countdown, imgSrc, capture, modelsLoaded]);
 
-  // Separate effect for handling the countdown timer
-  React.useEffect(() => {
-    // Clear any existing countdown interval
-    if (countdownIntervalRef.current) {
-      clearInterval(countdownIntervalRef.current);
-      countdownIntervalRef.current = null;
-    }
-    
-    // If countdown is active, start the timer
-    if (countdown !== null && countdown > 0) {
-      console.log(`Starting countdown from ${countdown}`);
-      
-      countdownIntervalRef.current = setInterval(() => {
-        setCountdown(prev => {
-          console.log(`Countdown tick: ${prev}`);
-          
-          if (prev === null || prev <= 1) {
-            // Clear the interval when we reach 0
-            if (countdownIntervalRef.current) {
-              clearInterval(countdownIntervalRef.current);
-              countdownIntervalRef.current = null;
-            }
-            
-            // Auto capture when countdown reaches 0
-            if (prev === 1) {
-              console.log('Countdown complete, capturing photo');
-              // Use setTimeout to ensure state updates before capture
-              setTimeout(() => capture(), 0);
-            }
-            
-            return null;
-          }
-          
-          // Decrement the countdown
-          return prev - 1;
-        });
-      }, 1000);
-      
-      // Cleanup function
-      return () => {
-        if (countdownIntervalRef.current) {
-          clearInterval(countdownIntervalRef.current);
-          countdownIntervalRef.current = null;
-        }
-      };
-    }
-  }, [countdown, capture]);
 
   // Initialize webcam and get devices on component mount
   React.useEffect(() => {
@@ -459,7 +198,9 @@ export default function WebcamCaptureSimple({ onImageCapture }: WebcamCapturePro
     // Cleanup on unmount
     return () => {
       stopWebcam();
-      navigator.mediaDevices.removeEventListener('devicechange', getVideoDevices);
+      if (navigator.mediaDevices && navigator.mediaDevices.removeEventListener) {
+        navigator.mediaDevices.removeEventListener('devicechange', getVideoDevices);
+      }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -500,36 +241,12 @@ export default function WebcamCaptureSimple({ onImageCapture }: WebcamCapturePro
           <div className="absolute inset-0 bg-white z-20 animate-flash"></div>
         )}
         
-        {/* Face detection guide - oval shape and always visible, using the original style */}
+        {/* Position guide overlay */}
         {showGuide && !imgSrc && (
-          <div className="absolute inset-0 z-10 pointer-events-none">
-            <div 
-              className={`border-4 ${faceDetected ? 'border-[#00ff4c]' : 'border-white/50'} absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-[50%] transition-colors duration-500 ease-in-out`}
-              style={{ 
-                width: '40%', 
-                height: '95%',
-              }}
-            >
-              {faceDetected && (
-                <div className="absolute inset-0 bg-[#00ff4c]/10 rounded-[50%] animate-pulse"></div>
-              )}
-              
-              {/* Status indicator for face detection */}
-              <div className={`absolute bottom-[-30px] left-1/2 -translate-x-1/2 px-2 py-1 rounded-full text-xs font-medium transition-all duration-300
-                ${faceDetected ? 'bg-[#00ff4c]/90 text-black' : 'bg-gray-800/70 text-white'}`}>
-                {!faceDetected ? 'Searching...' : 
-                  countdown ? 'Ready!' : 
-                  autoCapture && facePositionedTimeRef.current ? 'Hold still...' : 'Face Detected'}
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Countdown display */}
-        {countdown !== null && (
-          <div className="absolute inset-0 bg-black/30 z-20 flex items-center justify-center pointer-events-none">
-            <div className="text-8xl font-bold text-white animate-pulse">
-              {countdown}
+          <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
+            <div className="text-center text-white bg-black/50 p-4 rounded-lg">
+              <p className="text-lg font-medium mb-2">Position Your Face</p>
+              <p className="text-sm opacity-80">Center yourself in the frame and click capture</p>
             </div>
           </div>
         )}
@@ -561,76 +278,87 @@ export default function WebcamCaptureSimple({ onImageCapture }: WebcamCapturePro
         )}
       </div>
       
-      {!imgSrc && (
-        <div className="w-full max-w-xl space-y-3">
+      {!imgSrc && videoDevices.length > 1 && (
+        <div className="w-full max-w-xl">
           {/* Camera selection dropdown */}
-          {videoDevices.length > 1 && (
-            <Select
-              value={selectedDeviceId}
-              onValueChange={handleDeviceChange}
-              disabled={isLoading}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select camera" />
-              </SelectTrigger>
-              <SelectContent>
-                {videoDevices.map((device) => (
-                  <SelectItem key={device.deviceId} value={device.deviceId}>
-                    {device.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-          
-          {/* Auto-capture toggle */}
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="auto-capture">Auto-capture</Label>
-              <p className="text-sm text-muted-foreground">
-                Automatically take photo when face is detected
-              </p>
-            </div>
-            <Switch
-              id="auto-capture"
-              checked={autoCapture}
-              onCheckedChange={() => toggleAutoCapture()}
-            />
-          </div>
+          <Select
+            value={selectedDeviceId}
+            onValueChange={handleDeviceChange}
+            disabled={isLoading}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select camera" />
+            </SelectTrigger>
+            <SelectContent>
+              {videoDevices.map((device) => (
+                <SelectItem key={device.deviceId} value={device.deviceId}>
+                  {device.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
       
+      {/* Action buttons */}
       <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xl mt-2">
-        <Button
-          onClick={imgSrc ? retake : capture}
-          className="flex-1 px-6 py-2 h-12 text-base transition-all duration-300 hover:scale-105"
-          disabled={isLoading || hasPermission === false || (!imgSrc && autoCapture && countdown !== null)}
-        >
-          {imgSrc ? (
-            <>
-              Retake Photo
-            </>
-          ) : (
-            <>
-              <Camera className="mr-2 h-5 w-5" />
-              {faceDetected ? "Perfect! Take Photo" : "Take Photo"}
-            </>
-          )}
-        </Button>
+        {!showUsernameInput ? (
+          <>
+            <Button
+              onClick={imgSrc ? retake : capture}
+              className="flex-1 px-6 py-2 h-12 text-base transition-all duration-300 hover:scale-105"
+              disabled={isLoading || hasPermission === false}
+            >
+              {imgSrc ? (
+                "Retake Photo"
+              ) : (
+                <>
+                  <Camera className="mr-2 h-5 w-5" />
+                  Take Photo
+                </>
+              )}
+            </Button>
+            {imgSrc && (
+              <Button
+                onClick={() => setShowUsernameInput(true)}
+                className="flex-1 px-6 py-2 h-12 text-base bg-green-600 hover:bg-green-700"
+                disabled={isLoading}
+              >
+                Add to Leaderboard
+              </Button>
+            )}
+          </>
+        ) : (
+          <div className="w-full">
+            <UsernameInput
+              onUsernameConfirm={handleUsernameConfirm}
+              disabled={isUploading}
+            />
+          </div>
+        )}
       </div>
       
-      {/* Position guide text from original component */}
-      {!imgSrc && (
+      {/* Helper text */}
+      {!imgSrc && !showUsernameInput && (
         <div className="flex flex-col items-center w-full max-w-xl mt-2">
           <p className="text-center text-muted-foreground text-sm w-full">
-            Position your face within the oval guide {autoCapture ? "and hold still for automatic capture." : "then click the Take Photo button."}
+            Position yourself in the frame and click the Take Photo button.
           </p>
           <a 
-            href="mailto:hello@looxmaxx.com" 
+            href="mailto:hello@ratemyfeet.com" 
             className="mt-2 text-primary hover:text-primary/80 font-medium transition-colors"
           >
-            Suggestions? Problems? Moan-and-Groan? Holla at Us!
+            Questions? Suggestions? Contact Us!
           </a>
+        </div>
+      )}
+      
+      {isUploading && (
+        <div className="flex flex-col items-center w-full max-w-xl mt-2">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary mb-2"></div>
+          <p className="text-center text-muted-foreground text-sm">
+            Uploading your image to the leaderboard...
+          </p>
         </div>
       )}
       
@@ -643,4 +371,86 @@ export default function WebcamCaptureSimple({ onImageCapture }: WebcamCapturePro
       )}
     </div>
   );
+
+  // Handle username confirmation and image upload
+  async function handleUsernameConfirm(username: string) {
+    if (!imgSrc || !username.trim()) return;
+    
+    setIsUploading(true);
+    setError(null);
+    
+    try {
+      // Convert data URL to File object
+      const imageFile = dataURLtoFile(imgSrc, `${username}-${Date.now()}.jpg`);
+      
+      // Generate unique filename
+      const fileName = `${Date.now()}-${username}-${Math.random().toString(36).substr(2, 9)}.jpg`;
+      
+      // Upload image to Supabase storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(fileName, imageFile, {
+          cacheControl: '3600',
+          upsert: false
+        });
+      
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error('Failed to upload image. Please try again.');
+      }
+      
+      // Get public URL for the uploaded image
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(fileName);
+      
+      // Save image record to database
+      const { data: imageData, error: dbError } = await supabase
+        .from('images')
+        .insert({
+          username: username.trim(),
+          image_url: publicUrl,
+          median_score: 0,
+          rating_count: 0,
+          is_visible: true
+        })
+        .select()
+        .single();
+      
+      if (dbError) {
+        console.error('Database error:', dbError);
+        throw new Error('Failed to save image record. Please try again.');
+      }
+      
+      // Call the callback with uploaded image data
+      onImageUploaded?.({
+        id: imageData.id,
+        username: imageData.username,
+        image_url: imageData.image_url
+      });
+      
+      // Reset component state
+      setImgSrc(null);
+      setShowUsernameInput(false);
+      onImageCapture?.(null);
+      
+    } catch (error) {
+      console.error('Error in handleUsernameConfirm:', error);
+      
+      let errorMessage = 'Failed to upload image. Please try again.';
+      if (error instanceof Error) {
+        if (error.message.includes('upload')) {
+          errorMessage = 'Failed to upload image. Please check your connection and try again.';
+        } else if (error.message.includes('database')) {
+          errorMessage = 'Failed to save image. Please try again.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setIsUploading(false);
+    }
+  }
 } 
