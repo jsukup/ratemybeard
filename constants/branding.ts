@@ -16,18 +16,18 @@ export const BRAND_CONFIG = {
   contactEmail: 'hello@ratemyfeet.com',
   supportEmail: 'support@ratemyfeet.com',
   
-  // Asset Paths (TODO: Replace with actual assets when available)
+  // Asset Paths - Updated with actual assets
   assets: {
-    // Logo variations (replace these paths when you have actual assets)
+    // Logo variations
     logo: {
-      main: '/images/ratemyfeet-logo.png', // TODO: Add main logo
-      light: '/images/ratemyfeet-logo-light.png', // TODO: Add light variant
-      dark: '/images/ratemyfeet-logo-dark.png', // TODO: Add dark variant
-      icon: '/images/ratemyfeet-icon.png', // TODO: Add icon/favicon
-      wordmark: '/images/ratemyfeet-wordmark.png', // TODO: Add text-only logo
+      main: '/images/ratemyfeet-logo.png', // Main dark logo (wordmark style)
+      light: '/images/ratemyfeet-logo-light.png', // Light variant for dark backgrounds
+      dark: '/images/ratemyfeet-logo.png', // Same as main (already dark)
+      icon: '/images/ratemyfeet-icon-dark.png', // Square icon variant
+      wordmark: '/images/ratemyfeet-logo.png', // Same as main (is wordmark style)
     },
     
-    // Favicons (TODO: Generate and add when logo is ready)
+    // Favicons - Updated with actual assets
     favicon: {
       ico: '/favicon-ratemyfeet.ico',
       png16: '/favicon-16x16.png',
@@ -37,15 +37,15 @@ export const BRAND_CONFIG = {
       androidChrome512: '/android-chrome-512x512.png',
     },
     
-    // Social Media Images (TODO: Create when logo is ready)
+    // Social Media Images - Updated with actual assets
     social: {
       ogImage: '/images/og-image.png', // 1200x630 for social sharing
       twitterCard: '/images/twitter-card.png', // 1200x600 for Twitter
     },
     
-    // App Icons (TODO: Generate when logo is ready)
+    // App Icons - Updated with actual assets
     appIcons: {
-      ios180: '/apple-touch-icon-180x180.png',
+      ios180: '/apple-touch-icon.png', // Using main apple-touch-icon (180x180)
       ios152: '/apple-touch-icon-152x152.png',
       ios120: '/apple-touch-icon-120x120.png',
     }
