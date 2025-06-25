@@ -119,9 +119,7 @@
   main {
     flex: 1 1 auto;
     min-height: 0;
-    max-height: calc(100vh - 60px); /* Account for footer */
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
     position: relative;
     z-index: 1;
   }
@@ -158,25 +156,64 @@
   animation: flash 0.3s ease-out forwards;
 }
 
-/* Optimized logo glow animation with reduced motion support */
+/* Enhanced logo glow animation with stronger pulsating effect */
 @keyframes logo-glow {
   0% {
     transform: scale(1);
-    opacity: 0.9;
+    opacity: 0.85;
+    filter: drop-shadow(0 0 10px rgba(var(--brand-purple), 0.4))
+            drop-shadow(0 0 20px rgba(var(--brand-pink), 0.3))
+            drop-shadow(0 0 30px rgba(var(--brand-blue), 0.2));
   }
   50% {
-    transform: scale(1.02);
+    transform: scale(1.08);
     opacity: 1;
+    filter: drop-shadow(0 0 20px rgba(var(--brand-purple), 0.8))
+            drop-shadow(0 0 40px rgba(var(--brand-pink), 0.6))
+            drop-shadow(0 0 60px rgba(var(--brand-blue), 0.4));
   }
   100% {
     transform: scale(1);
-    opacity: 0.9;
+    opacity: 0.85;
+    filter: drop-shadow(0 0 10px rgba(var(--brand-purple), 0.4))
+            drop-shadow(0 0 20px rgba(var(--brand-pink), 0.3))
+            drop-shadow(0 0 30px rgba(var(--brand-blue), 0.2));
   }
 }
 
 .logo-animation {
-  animation: logo-glow 4s ease-in-out infinite;
-  will-change: transform, opacity;
+  animation: logo-glow 3s ease-in-out infinite;
+  will-change: transform, opacity, filter;
+  position: relative;
+}
+
+/* Additional glowing background effect */
+.logo-animation::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+  background: radial-gradient(circle, 
+    rgba(var(--brand-purple), 0.15) 0%, 
+    rgba(var(--brand-pink), 0.1) 30%, 
+    rgba(var(--brand-blue), 0.05) 60%, 
+    transparent 100%);
+  border-radius: 50%;
+  animation: glow-background 3s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes glow-background {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
 }
 
 /* Respect user's reduced motion preference */
@@ -403,7 +440,7 @@ body {
   max-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* Additional styles to ensure the layout works correctly */
