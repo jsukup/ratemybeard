@@ -85,9 +85,6 @@ function HomeContent() {
     setHasImage(!!image);
     setCurrentImage(image);
     setError(null);
-    if (image) {
-      setShowDialog(true);
-    }
   };
 
 
@@ -382,15 +379,7 @@ function HomeContent() {
                       </p>
                     </div>
                     
-                    <WebcamCaptureSimple onImageCapture={handleImageCapture} />
-                    
-                    {hasImage && (
-                      <div className="flex justify-center mt-4">
-                        <Button className="px-4" onClick={() => handleImageCapture(null)}>
-                          Take New Photo
-                        </Button>
-                      </div>
-                    )}
+                    <WebcamCaptureSimple onImageCapture={handleImageCapture} onAddToLeaderboard={() => setShowDialog(true)} />
                   </Card>
                   
                   {/* Ad container at the bottom of the Upload tab */}
@@ -426,6 +415,8 @@ function HomeContent() {
               <DialogTitle>Submit to Leaderboard</DialogTitle>
               <DialogDescription>
                 Submit your photo to the leaderboard. Your photo will be visible publicly for rating.
+                <br /><br />
+                <strong>Important:</strong> Remember your username! It's the only way to find your image on the leaderboard and check your rating. Your username cannot be recovered or changed once submitted.
               </DialogDescription>
             </DialogHeader>
             
@@ -451,7 +442,7 @@ function HomeContent() {
                 />
               </div>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-start space-x-2">
                 <Checkbox 
                   id="terms" 
                   checked={agreeTerms} 
@@ -459,9 +450,10 @@ function HomeContent() {
                   disabled={submitting}
                   aria-required="true"
                   aria-describedby="terms-description"
+                  className="mt-0.5"
                 />
-                <Label htmlFor="terms" className="text-sm" id="terms-description">
-                  I agree to share my photo publicly and confirm that I am over 18 years old.
+                <Label htmlFor="terms" className="text-sm leading-relaxed" id="terms-description">
+                  I have read and agree to the <a href="/privacy" target="_blank" className="text-primary hover:underline">Privacy Policy</a> and <a href="/image-policy" target="_blank" className="text-primary hover:underline">Image Policy</a>. I understand submitted images become property of RateMyFeet and will only be deleted if they violate the Image Policy. I confirm I am 18+ years old and will safeguard my username to check ratings later.
                 </Label>
               </div>
               
@@ -481,7 +473,16 @@ function HomeContent() {
       {/* Footer with proper positioning */}
       <footer className="py-4 border-t border-gray-800 bg-black/30 backdrop-blur-sm w-full">
         <div className="container mx-auto px-4">
-          <div className="text-center">
+          <div className="text-center space-y-2">
+            <div className="flex justify-center space-x-4 text-sm">
+              <a href="/privacy" className="text-gray-400 hover:text-white transition-colors">
+                Privacy Policy
+              </a>
+              <span className="text-gray-600">•</span>
+              <a href="/image-policy" className="text-gray-400 hover:text-white transition-colors">
+                Image Policy
+              </a>
+            </div>
             <p className="text-sm text-gray-400">&copy; 2025 RateMyFeet. All Rights Reserved</p>
           </div>
         </div>

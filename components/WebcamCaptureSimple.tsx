@@ -32,6 +32,7 @@ function dataURLtoFile(dataurl: string, filename: string): File {
 interface WebcamCaptureProps {
   onImageCapture?: (image: string | null) => void;
   onImageUploaded?: (imageData: { id: string; username: string; image_url: string }) => void;
+  onAddToLeaderboard?: () => void;
 }
 
 interface VideoDevice {
@@ -39,7 +40,7 @@ interface VideoDevice {
   label: string;
 }
 
-export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded }: WebcamCaptureProps) {
+export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, onAddToLeaderboard }: WebcamCaptureProps) {
   const [imgSrc, setImgSrc] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [hasPermission, setHasPermission] = React.useState<boolean | null>(null);
@@ -320,7 +321,7 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded }:
             </Button>
             {imgSrc && (
               <Button
-                onClick={() => setShowUsernameInput(true)}
+                onClick={() => onAddToLeaderboard?.()}
                 className="flex-1 px-6 py-2 h-12 text-base bg-green-600 hover:bg-green-700"
                 disabled={isLoading}
               >
