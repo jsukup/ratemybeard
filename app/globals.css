@@ -119,9 +119,17 @@
   main {
     flex: 1 1 auto;
     min-height: 0;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
     z-index: 1;
+    /* Hide scrollbar but allow scrolling */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  
+  main::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
   }
   
   footer {
@@ -437,10 +445,9 @@ body {
 /* Override any potential overflow issues */
 #__next, .page-animation {
   min-height: 100vh;
-  max-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* Additional styles to ensure the layout works correctly */
