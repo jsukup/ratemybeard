@@ -1,0 +1,37 @@
+# Exclude large directories that slow down Claude Code scanning
+node_modules/
+.next/
+.git/
+dist/
+build/
+coverage/
+
+# Exclude generated and cache files
+*.log
+*.cache
+.npm/
+.yarn/
+.pnp/
+
+# Exclude environment and config files with sensitive data
+.env
+.env.local
+.env.production
+
+# Exclude IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Exclude OS files
+.DS_Store
+Thumbs.db
+
+# Exclude large data directories
+api/data/
+api/models/
+models/
+*.h5
+*.npz
+*.csv 

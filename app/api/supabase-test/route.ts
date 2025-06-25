@@ -19,43 +19,59 @@ export async function GET(request: NextRequest) {
     
     const supabase = createClient(supabaseUrl, supabaseKey);
     
-    // Test storage bucket access
-    const { data: bucketData, error: bucketError } = await supabase.storage.listBuckets();
+    // Test storage bucket access directly (don't rely on listBuckets which needs admin permissions)
+    let imagesBucketExists = false;
+    let storageAccessTest = false;
+    let bucketError = null;
     
-    const bucketList = bucketData?.map(bucket => bucket.name) || [];
-    const imagesBucketExists = bucketList.includes('images');
-    
-    let imagesPublicFolderExists = false;
-    let entriesTableAccessible = false;
-    
-    // Only check the public folder if the images bucket exists
-    if (imagesBucketExists) {
-      const { data: folderData, error: folderError } = await supabase.storage
+    // Test images bucket directly by trying to list its contents
+    try {
+      const { data: files, error: listError } = await supabase.storage
         .from('images')
-        .list('public', { limit: 1 });
+        .list('', { limit: 1 });
       
-      imagesPublicFolderExists = !folderError;
+      if (!listError) {
+        imagesBucketExists = true;
+        storageAccessTest = true;
+      } else {
+        bucketError = listError.message;
+      }
+    } catch (e) {
+      bucketError = e instanceof Error ? e.message : 'Unknown storage error';
     }
     
-    // Test database access to entries table
-    const { data: entriesData, error: entriesError } = await supabase
-      .from('entries')
+    let imagesTableAccessible = false;
+    let ratingsTableAccessible = false;
+    
+    // Test database access to images table
+    const { data: imagesData, error: imagesError } = await supabase
+      .from('images')
       .select('id')
       .limit(1);
     
-    entriesTableAccessible = !entriesError;
+    imagesTableAccessible = !imagesError;
+    
+    // Test database access to ratings table
+    const { data: ratingsData, error: ratingsError } = await supabase
+      .from('ratings')
+      .select('id')
+      .limit(1);
+    
+    ratingsTableAccessible = !ratingsError;
     
     return NextResponse.json({
       status: 'success',
       supabase_connected: true,
-      buckets: {
-        list: bucketList,
+      storage: {
         images_bucket_exists: imagesBucketExists,
-        images_public_folder_exists: imagesPublicFolderExists
+        storage_access_test: storageAccessTest,
+        bucket_error: bucketError
       },
       database: {
-        entries_table_accessible: entriesTableAccessible,
-        entries_error: entriesError ? entriesError.message : null
+        images_table_accessible: imagesTableAccessible,
+        ratings_table_accessible: ratingsTableAccessible,
+        images_error: imagesError ? imagesError.message : null,
+        ratings_error: ratingsError ? ratingsError.message : null
       }
     });
   } catch (error) {

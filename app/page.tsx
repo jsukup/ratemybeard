@@ -101,9 +101,9 @@ function HomeContent() {
     try {
       // Use ILIKE for case-insensitive matching
       const { data, error } = await supabase
-        .from('entries')
-        .select('screen_name')
-        .ilike('screen_name', name.trim())
+        .from('images')
+        .select('username')
+        .ilike('username', name.trim())
         .limit(1);
       
       if (error) {
@@ -228,10 +228,10 @@ function HomeContent() {
             .from('images')
             .insert([
               {
-                user_id: 'anonymous', // In a real app, use actual user IDs if available
                 username: screenName,
                 image_url: imageUrl,
                 image_name: fileName,
+                rating_count: 0,
                 is_visible: true
               }
             ])
@@ -251,9 +251,9 @@ function HomeContent() {
             // Try to fetch the newly created entry
             try {
               const { data: fetchedEntry, error: fetchError } = await supabase
-                .from('entries')
+                .from('images')
                 .select('*')
-                .eq('screen_name', screenName)
+                .eq('username', screenName)
                 .order('created_at', { ascending: false })
                 .limit(1);
                 
@@ -327,7 +327,7 @@ function HomeContent() {
           <div className="text-center mb-6">
             <div className="mx-auto mb-4 logo-animation">
               <img 
-                src="/mainlogo.png" 
+                src="/images/ratemyfeet-logo.png" 
                 alt="RateMyFeet Logo" 
                 className="h-24 mx-auto"
               />

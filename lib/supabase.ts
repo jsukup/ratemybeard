@@ -12,13 +12,22 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_A
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export type Entry = {
+export type ImageEntry = {
   id: string;
-  user_id: string;
-  screen_name: string;
-  score: number;
+  username: string;
   image_url: string;
-  image_name: string;
-  created_at: string;
+  image_name?: string;
+  median_score?: number;
+  rating_count: number;
   is_visible: boolean;
+  created_at: string;
+};
+
+export type Rating = {
+  id: string;
+  image_id: string;
+  rating: number;
+  session_id: string;
+  ip_address?: string;
+  created_at: string;
 };
