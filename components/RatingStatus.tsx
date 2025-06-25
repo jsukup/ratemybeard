@@ -10,12 +10,16 @@ interface RatingStatusProps {
   imageId: string;
   onRatingSubmitted?: (rating: number) => void;
   className?: string;
+  isUnrated?: boolean;
+  ratingCount?: number;
 }
 
 export default function RatingStatus({ 
   imageId, 
   onRatingSubmitted, 
-  className = "" 
+  className = "",
+  isUnrated = false,
+  ratingCount = 0
 }: RatingStatusProps) {
   const [hasRated, setHasRated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -101,6 +105,19 @@ export default function RatingStatus({
   // Show rating slider if not rated yet
   return (
     <div className={className}>
+      {isUnrated && (
+        <Alert className="mb-4 border-blue-200 bg-blue-50 text-blue-800">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            🆕 This is a new upload! Be the first to rate it and help others discover great content.
+            {ratingCount > 0 && (
+              <span className="block mt-1 text-xs">
+                Current ratings: {ratingCount}/10 needed for leaderboard
+              </span>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
       <RatingSlider 
         imageId={imageId} 
         onSubmit={handleRatingSubmitted}

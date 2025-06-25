@@ -249,6 +249,7 @@ export async function getLeaderboardData(options: {
   sortBy?: 'median_score' | 'rating_count' | 'created_at';
   sortOrder?: 'asc' | 'desc';
   category?: string;
+  includeUnrated?: boolean;
 } = {}): Promise<{
   data: Array<{
     id: string;
@@ -275,18 +276,25 @@ export async function getLeaderboardData(options: {
       offset = 0,
       sortBy = 'created_at',
       sortOrder = 'desc',
-      category
+      category,
+      includeUnrated = false
     } = options;
 
     // Calculate page number
     const page = Math.floor(offset / limit) + 1;
 
     // First, get total count for pagination
-    const { count: totalCount, error: countError } = await supabase
+    let countQuery = supabase
       .from('images')
       .select('*', { count: 'exact', head: true })
-      .eq('is_visible', true)
-      .gte('rating_count', minRatings);
+      .eq('is_visible', true);
+    
+    // Only apply minimum ratings filter if not including unrated images
+    if (!includeUnrated) {
+      countQuery = countQuery.gte('rating_count', minRatings);
+    }
+    
+    const { count: totalCount, error: countError } = await countQuery;
 
     if (countError) {
       console.error('Error getting total count:', countError);
@@ -297,8 +305,14 @@ export async function getLeaderboardData(options: {
     let query = supabase
       .from('images')
       .select('id, username, image_url, median_score, rating_count, created_at, is_visible')
-      .eq('is_visible', true)
-      .gte('rating_count', minRatings)
+      .eq('is_visible', true);
+    
+    // Only apply minimum ratings filter if not including unrated images
+    if (!includeUnrated) {
+      query = query.gte('rating_count', minRatings);
+    }
+    
+    query = query
       .order(sortBy, { ascending: sortOrder === 'asc' })
       .range(offset, offset + limit - 1);
 
@@ -328,11 +342,17 @@ export async function getLeaderboardData(options: {
 
     // For category assignment, we need global rankings, not just current page
     // Get all images to calculate proper percentiles
-    const { data: allImages, error: allImagesError } = await supabase
+    let allImagesQuery = supabase
       .from('images')
-      .select('id, median_score')
-      .eq('is_visible', true)
-      .gte('rating_count', minRatings)
+      .select('id, median_score, rating_count')
+      .eq('is_visible', true);
+    
+    // Only apply minimum ratings filter if not including unrated images
+    if (!includeUnrated) {
+      allImagesQuery = allImagesQuery.gte('rating_count', minRatings);
+    }
+    
+    const { data: allImages, error: allImagesError } = await allImagesQuery
       .order('median_score', { ascending: false });
 
     if (allImagesError) {
@@ -355,8 +375,13 @@ export async function getLeaderboardData(options: {
     // Create a map of image ID to category based on global ranking
     const categoryMap = new Map<string, string>();
     if (allImages) {
-      allImages.forEach((image, index) => {
-        const percentile = (index / allImages.length) * 100;
+      // First, separate rated and unrated images
+      const ratedImages = allImages.filter(img => img.rating_count >= minRatings);
+      const unratedImages = allImages.filter(img => img.rating_count < minRatings);
+      
+      // Assign categories to rated images based on percentile
+      ratedImages.forEach((image, index) => {
+        const percentile = (index / ratedImages.length) * 100;
         
         let category: string;
         if (percentile >= 90) category = "Dregs";
@@ -366,6 +391,11 @@ export async function getLeaderboardData(options: {
         else category = "Smoke Shows";
 
         categoryMap.set(image.id, category);
+      });
+      
+      // Assign "Unrated" category to images without enough ratings
+      unratedImages.forEach(image => {
+        categoryMap.set(image.id, "Unrated");
       });
     }
 

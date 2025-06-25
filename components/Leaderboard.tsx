@@ -27,9 +27,10 @@ interface LeaderboardImage {
   rating_count: number;
   created_at: string;
   category: string;
+  isUnrated?: boolean;
 }
 
-type CategoryName = "Smoke Shows" | "Monets" | "Mehs" | "Plebs" | "Dregs";
+type CategoryName = "Newest" | "Smoke Shows" | "Monets" | "Mehs" | "Plebs" | "Dregs";
 
 interface CategoryConfig {
   name: CategoryName;
@@ -40,6 +41,13 @@ interface CategoryConfig {
 }
 
 const CATEGORY_CONFIGS: CategoryConfig[] = [
+  { 
+    name: "Newest", 
+    label: "🆕 Newest Uploads", 
+    icon: <TrendingUp className="h-4 w-4" />, 
+    color: "bg-green-500",
+    description: "Fresh uploads waiting for ratings!"
+  },
   { 
     name: "Smoke Shows", 
     label: "🔥 The Smoke Shows", 
@@ -94,7 +102,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
   const [images, setImages] = useState<LeaderboardImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeCategory, setActiveCategory] = useState<CategoryName>("Smoke Shows");
+  const [activeCategory, setActiveCategory] = useState<CategoryName>("Newest");
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Categorize images by their category (with safety check)
@@ -122,18 +130,39 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
         throw new Error('Database connection not configured. Please check your environment variables.');
       }
 
-      const result = await getLeaderboardData({
-        minRatings: MIN_RATINGS_FOR_RANKING,
-        limit: 1000,
-        sortBy: 'created_at',
-        sortOrder: 'desc'
-      });
+      // Fetch both rated and unrated images
+      const [ratedResult, unratedResult] = await Promise.all([
+        // Fetch rated images for categories
+        getLeaderboardData({
+          minRatings: MIN_RATINGS_FOR_RANKING,
+          limit: 1000,
+          sortBy: 'median_score',
+          sortOrder: 'desc',
+          includeUnrated: false
+        }),
+        // Fetch unrated images for "Newest" tab
+        getLeaderboardData({
+          minRatings: 0,
+          limit: 100,
+          sortBy: 'created_at',
+          sortOrder: 'desc',
+          includeUnrated: true
+        })
+      ]);
 
-      if (result === null) {
+      if (ratedResult === null || unratedResult === null) {
         throw new Error('Failed to fetch leaderboard data');
       }
 
-      setImages(result.data || []);
+      // Combine all images and mark unrated ones
+      const allImages = [
+        ...ratedResult.data.map(img => ({ ...img, isUnrated: img.rating_count < MIN_RATINGS_FOR_RANKING })),
+        ...unratedResult.data
+          .filter(img => img.rating_count < MIN_RATINGS_FOR_RANKING)
+          .map(img => ({ ...img, category: 'Newest', isUnrated: true }))
+      ];
+
+      setImages(allImages);
 
     } catch (err) {
       console.error('Error fetching leaderboard:', err);
@@ -265,7 +294,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
 
       {/* Category Navigation */}
       <Tabs value={activeCategory} onValueChange={(value) => setActiveCategory(value as CategoryName)}>
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1">
           {CATEGORY_CONFIGS.map((config) => (
             <TabsTrigger key={config.name} value={config.name} className="text-xs p-2 sm:p-3">
               <span className="hidden md:inline">{config.icon}</span>
@@ -339,12 +368,18 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                   {image.username}
                                 </TableCell>
                                 <TableCell className="text-center">
-                                  <div className="flex items-center justify-center gap-1">
-                                    <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500" />
-                                    <span className="font-bold text-sm sm:text-lg">
-                                      {image.median_score.toFixed(2)}
-                                    </span>
-                                  </div>
+                                  {image.isUnrated || image.rating_count < MIN_RATINGS_FOR_RANKING ? (
+                                    <Badge variant="outline" className="text-xs">
+                                      Needs {MIN_RATINGS_FOR_RANKING - image.rating_count} more ratings
+                                    </Badge>
+                                  ) : (
+                                    <div className="flex items-center justify-center gap-1">
+                                      <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500" />
+                                      <span className="font-bold text-sm sm:text-lg">
+                                        {image.median_score.toFixed(2)}
+                                      </span>
+                                    </div>
+                                  )}
                                 </TableCell>
                                 <TableCell className="text-center hidden sm:table-cell">
                                   <Badge variant="outline" className="text-xs">
