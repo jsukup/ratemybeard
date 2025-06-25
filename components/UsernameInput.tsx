@@ -179,6 +179,10 @@ export default function UsernameInput({
               placeholder="Enter username (3-20 characters)"
               disabled={disabled || isChecking}
               maxLength={20}
+              aria-label="Username"
+              aria-describedby="username-help username-status"
+              aria-invalid={isValid === false}
+              aria-required="true"
               className={`pr-10 ${
                 isValid === true 
                   ? 'border-green-500 focus:border-green-500' 
@@ -201,28 +205,30 @@ export default function UsernameInput({
           </div>
 
           {/* Character Counter */}
-          <div className="flex justify-between text-xs text-muted-foreground">
+          <div id="username-help" className="flex justify-between text-xs text-muted-foreground">
             <span>Letters, numbers, _ and - only</span>
-            <span>{username.length}/20</span>
+            <span aria-label={`${username.length} of 20 characters used`}>{username.length}/20</span>
           </div>
         </div>
 
         {/* Status Messages */}
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+        <div id="username-status" aria-live="polite">
+          {error && (
+            <Alert variant="destructive" role="alert">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-        {isValid === true && !error && (
-          <Alert className="border-green-200 bg-green-50 text-green-800">
-            <CheckCircle className="h-4 w-4" />
-            <AlertDescription>
-              Great! "{username}" is available
-            </AlertDescription>
-          </Alert>
-        )}
+          {isValid === true && !error && (
+            <Alert className="border-green-200 bg-green-50 text-green-800" role="status">
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription>
+                Great! &quot;{username}&quot; is available
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
 
         {/* Confirm Button */}
         <Button

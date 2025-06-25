@@ -245,8 +245,8 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded }:
         {showGuide && !imgSrc && (
           <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
             <div className="text-center text-white bg-black/50 p-4 rounded-lg">
-              <p className="text-lg font-medium mb-2">Position Your Face</p>
-              <p className="text-sm opacity-80">Center yourself in the frame and click capture</p>
+              <p className="text-lg font-medium mb-2">Position Your Feet</p>
+              <p className="text-sm opacity-80">Center your feet in the frame and click capture</p>
             </div>
           </div>
         )}
@@ -342,7 +342,7 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded }:
       {!imgSrc && !showUsernameInput && (
         <div className="flex flex-col items-center w-full max-w-xl mt-2">
           <p className="text-center text-muted-foreground text-sm w-full">
-            Position yourself in the frame and click the Take Photo button.
+            Position your feet in the frame and click the Take Photo button.
           </p>
           <a 
             href="mailto:hello@ratemyfeet.com" 

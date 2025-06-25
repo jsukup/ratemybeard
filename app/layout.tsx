@@ -11,10 +11,10 @@ const inter = Inter({ subsets: ['latin'] });
 const TEST_ADS = false;
 
 export const metadata: Metadata = {
-  title: 'LooxMaxx - AI-Powered Attractiveness Analyzer',
-  description: 'Take a photo, get your attractiveness score, and compare with others on our leaderboard!',
-  keywords: ['attractiveness', 'AI', 'score', 'analyzer', 'leaderboard', 'photo', 'rating', 'deepface'],
-  authors: [{ name: 'LooxMaxx Team' }],
+  title: 'RateMyFeet - Rate the Attractiveness of Feet',
+  description: 'Upload photos of feet and get rated by the community! Join our leaderboard and see how you rank.',
+  keywords: ['feet', 'rating', 'attractiveness', 'community', 'leaderboard', 'photo', 'rating', 'feet pics'],
+  authors: [{ name: 'RateMyFeet Team' }],
   verification: {
     // Add your Google site verification here once you get it from Google AdSense
     google: 'google-site-verification=YOUR_VERIFICATION_CODE',
@@ -124,7 +124,7 @@ export default function RootLayout({
         <Script id="confetti-animation" strategy="afterInteractive">
           {`
             // Check if this is the first visit
-            const hasVisited = localStorage.getItem('hasVisitedLooxMaxx');
+            const hasVisited = localStorage.getItem('hasVisitedRateMyFeet');
             
             // Function to trigger confetti
             function triggerConfetti() {
@@ -162,7 +162,7 @@ export default function RootLayout({
                 });
                 
                 // Set the flag in localStorage
-                localStorage.setItem('hasVisitedLooxMaxx', 'true');
+                localStorage.setItem('hasVisitedRateMyFeet', 'true');
                 
                 // Create a fireworks effect with confetti
                 setTimeout(() => {

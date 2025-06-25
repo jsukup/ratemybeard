@@ -265,11 +265,11 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
 
       {/* Category Navigation */}
       <Tabs value={activeCategory} onValueChange={(value) => setActiveCategory(value as CategoryName)}>
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1">
           {CATEGORY_CONFIGS.map((config) => (
-            <TabsTrigger key={config.name} value={config.name} className="text-xs">
-              <span className="hidden sm:inline">{config.icon}</span>
-              <span className="ml-1">{config.name}</span>
+            <TabsTrigger key={config.name} value={config.name} className="text-xs p-2 sm:p-3">
+              <span className="hidden md:inline">{config.icon}</span>
+              <span className="ml-0 md:ml-1 truncate">{config.name}</span>
             </TabsTrigger>
           ))}
         </TabsList>
@@ -295,16 +295,16 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                       No images in this category yet
                     </div>
                   ) : (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto -mx-2 sm:mx-0">
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="w-12">Rank</TableHead>
-                            <TableHead className="w-20">Image</TableHead>
-                            <TableHead>Username</TableHead>
-                            <TableHead className="text-center">Rating</TableHead>
-                            <TableHead className="text-center">Votes</TableHead>
-                            <TableHead className="text-center">Submitted</TableHead>
+                            <TableHead className="w-12 text-xs">Rank</TableHead>
+                            <TableHead className="w-16 sm:w-20 text-xs">Image</TableHead>
+                            <TableHead className="text-xs">Username</TableHead>
+                            <TableHead className="text-center text-xs">Rating</TableHead>
+                            <TableHead className="text-center text-xs hidden sm:table-cell">Votes</TableHead>
+                            <TableHead className="text-center text-xs hidden md:table-cell">Submitted</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -317,7 +317,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                 key={image.id}
                                 className={isNewSubmission ? "bg-green-50 border-green-200" : ""}
                               >
-                                <TableCell className="font-medium">
+                                <TableCell className="font-medium text-xs">
                                   #{globalRank}
                                 </TableCell>
                                 <TableCell>
@@ -325,7 +325,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                     <img 
                                       src={image.image_url} 
                                       alt={`${image.username}'s submission`}
-                                      className="w-16 h-16 object-cover rounded-lg"
+                                      className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg"
                                       loading="lazy"
                                     />
                                     {isNewSubmission && (
@@ -335,23 +335,23 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                     )}
                                   </div>
                                 </TableCell>
-                                <TableCell className="font-medium">
+                                <TableCell className="font-medium text-xs sm:text-sm max-w-24 truncate">
                                   {image.username}
                                 </TableCell>
                                 <TableCell className="text-center">
                                   <div className="flex items-center justify-center gap-1">
-                                    <Star className="h-4 w-4 text-yellow-500" />
-                                    <span className="font-bold text-lg">
+                                    <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500" />
+                                    <span className="font-bold text-sm sm:text-lg">
                                       {image.median_score.toFixed(2)}
                                     </span>
                                   </div>
                                 </TableCell>
-                                <TableCell className="text-center">
-                                  <Badge variant="outline">
+                                <TableCell className="text-center hidden sm:table-cell">
+                                  <Badge variant="outline" className="text-xs">
                                     {image.rating_count}
                                   </Badge>
                                 </TableCell>
-                                <TableCell className="text-center text-sm text-muted-foreground">
+                                <TableCell className="text-center text-xs text-muted-foreground hidden md:table-cell">
                                   {formatDate(image.created_at)}
                                 </TableCell>
                               </TableRow>

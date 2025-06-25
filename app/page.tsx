@@ -320,20 +320,20 @@ function HomeContent() {
   };
 
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main className="container mx-auto px-2 sm:px-4 py-2 sm:py-4 lg:py-8">
       <div className="flex-grow">
-        <div className="container mx-auto px-4 py-8 flex flex-col items-center gap-8">
+        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-4 flex flex-col items-center gap-4 sm:gap-6">
           {/* Header */}
           <div className="text-center mb-6">
             <div className="mx-auto mb-4 logo-animation">
               <img 
                 src="/images/ratemyfeet-logo.png" 
                 alt="RateMyFeet Logo" 
-                className="h-24 mx-auto"
+                className="h-20 sm:h-28 md:h-36 lg:h-40 mx-auto"
               />
             </div>
-            <p className="text-xl text-white drop-shadow-lg font-semibold">
-              🦶 Rate the attractiveness of feet! 🦶
+            <p className="text-lg sm:text-xl text-white drop-shadow-lg font-semibold px-4">
+              🦶 Rate the attractiveness...of feet! 🦶
             </p>
           </div>
 
@@ -367,7 +367,7 @@ function HomeContent() {
                 </div>
 
                 <TabsContent value="upload" className="mt-4 space-y-6">
-                  <Card className="p-4 sm:p-6">
+                  <Card className="p-3 sm:p-4 md:p-6">
                     {error && (
                       <Alert variant="destructive" className="mb-6">
                         <AlertCircle className="h-4 w-4" />
@@ -430,13 +430,13 @@ function HomeContent() {
             </DialogHeader>
             
             {formError && (
-              <Alert variant="destructive" className="my-2">
+              <Alert variant="destructive" className="my-2" role="alert">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{formError}</AlertDescription>
               </Alert>
             )}
             
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" aria-label="Submit photo to leaderboard">
               <div className="space-y-2">
                 <Label htmlFor="screen-name">Screen Name</Label>
                 <Input
@@ -446,6 +446,8 @@ function HomeContent() {
                   placeholder="Choose a screen name"
                   required
                   disabled={submitting}
+                  aria-describedby={formError ? "form-error" : undefined}
+                  aria-invalid={!!formError}
                 />
               </div>
               
@@ -455,8 +457,10 @@ function HomeContent() {
                   checked={agreeTerms} 
                   onCheckedChange={(checked: boolean | 'indeterminate') => setAgreeTerms(checked === true)}
                   disabled={submitting}
+                  aria-required="true"
+                  aria-describedby="terms-description"
                 />
-                <Label htmlFor="terms" className="text-sm">
+                <Label htmlFor="terms" className="text-sm" id="terms-description">
                   I agree to share my photo publicly and confirm that I am over 18 years old.
                 </Label>
               </div>
