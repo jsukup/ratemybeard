@@ -1,0 +1,47 @@
+<context>
+# Problem Description
+[Describe the issue or change needed:
+- What is currently happening (current state)
+- What should happen instead (desired state)
+- Why this change is needed]
+
+# Affected Components
+[Identify what needs to be changed:
+- Specific files or components
+- UI elements or styling
+- Functionality or behavior
+- Keep this focused and specific]
+</context>
+<PRD>
+# Current State
+[Document the current implementation:
+- Existing code or styling
+- Current behavior or appearance
+- Relevant files and line numbers if known]
+
+# Desired State
+[Define the target outcome:
+- Exact changes needed
+- Expected behavior or appearance
+- Success criteria - how to know it's fixed]
+
+# Implementation Steps
+[Break down the fix into simple steps:
+- Step 1: [Action needed]
+- Step 2: [Action needed]  
+- Step 3: [Action needed]
+- Keep steps atomic and specific]
+
+# Validation
+[How to verify the fix works:
+- Manual testing steps
+- Visual verification needed
+- Functionality to check
+- Any potential side effects to watch for]
+
+# Notes
+[Additional context or considerations:
+- Why this approach was chosen
+- Alternative solutions considered
+- Any dependencies or related changes needed]
+</PRD>

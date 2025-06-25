@@ -88,11 +88,15 @@ export async function POST(request: NextRequest) {
 
     // Check daily rate limit for IP address (if IP is available)
     if (ipAddress && ipAddress !== 'unknown') {
+      // Calculate start of current day for more efficient querying
+      const now = new Date();
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
       const { data: dailyRatings, error: rateLimitError } = await supabase
         .from('ratings')
         .select('id')
         .eq('ip_address', ipAddress)
-        .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+        .gte('created_at', startOfDay.toISOString());
 
       if (rateLimitError) {
         console.error('Error checking rate limit:', rateLimitError);
@@ -125,16 +129,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // The database triggers should automatically update image statistics,
-    // but we can also manually trigger an update for immediate feedback
+    // Update image statistics with proper error handling
+    let statsUpdateSuccess = false;
     try {
       await updateImageStatistics(imageId);
+      statsUpdateSuccess = true;
     } catch (statsError) {
       console.error('Error updating image statistics:', statsError);
-      // Don't fail the request if stats update fails
+      // Log the error but don't fail the rating submission
+      // The user will still see their rating was accepted
     }
 
-    // Return success response
+    // Return success response with statistics update status
     return NextResponse.json({
       success: true,
       rating: {
@@ -143,6 +149,10 @@ export async function POST(request: NextRequest) {
         imageId: imageId,
         createdAt: insertedRating.created_at,
       },
+      statsUpdated: statsUpdateSuccess,
+      message: statsUpdateSuccess 
+        ? 'Rating submitted and leaderboard updated successfully!' 
+        : 'Rating submitted successfully! Leaderboard will update shortly.',
     });
 
   } catch (error) {
@@ -164,9 +174,11 @@ async function updateImageStatistics(imageId: string) {
 
     if (error) {
       console.error('Error calling update_image_stats function:', error);
+      throw new Error(`Database function failed: ${error.message}`);
     }
   } catch (error) {
     console.error('Error in updateImageStatistics:', error);
+    throw error; // Re-throw to be caught by calling function
   }
 }
 

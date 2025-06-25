@@ -111,18 +111,17 @@ export async function checkRateLimit(ipAddress?: string): Promise<{
       };
     }
     
-    // Calculate start and end of current day
+    // Calculate start of current day (end not needed for >= query)
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
     
-    // Count ratings from this IP today
+    // Count ratings from this IP today using more efficient query
     const { data, error, count } = await supabase
       .from('ratings')
       .select('*', { count: 'exact', head: true })
       .eq('ip_address', ipAddress)
-      .gte('created_at', startOfDay.toISOString())
-      .lt('created_at', endOfDay.toISOString());
+      .gte('created_at', startOfDay.toISOString());
     
     if (error) {
       console.error('Error checking rate limit:', error);

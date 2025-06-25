@@ -6,6 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Star } from "lucide-react";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 interface RatingSliderProps {
   imageId: string;
@@ -21,7 +22,7 @@ function Spinner({ className }: { className?: string }) {
   );
 }
 
-export default function RatingSlider({ imageId, onSubmit, disabled = false, className = "" }: RatingSliderProps) {
+function RatingSliderComponent({ imageId, onSubmit, disabled = false, className = "" }: RatingSliderProps) {
   const [rating, setRating] = useState<number[]>([5.00]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,10 +45,10 @@ export default function RatingSlider({ imageId, onSubmit, disabled = false, clas
 
     try {
       // Get session ID from localStorage or generate one
-      let sessionId = localStorage.getItem('rating_session_id');
+      let sessionId = localStorage.getItem('ratemyfeet_session_id');
       if (!sessionId) {
         sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        localStorage.setItem('rating_session_id', sessionId);
+        localStorage.setItem('ratemyfeet_session_id', sessionId);
       }
 
       const response = await fetch('/api/ratings/submit', {
@@ -58,7 +59,7 @@ export default function RatingSlider({ imageId, onSubmit, disabled = false, clas
         },
         body: JSON.stringify({
           imageId,
-          rating: parseFloat(currentRating.toFixed(2)),
+          rating: Math.round(currentRating * 100) / 100, // More efficient than parseFloat
         }),
       });
 
@@ -190,6 +191,8 @@ export default function RatingSlider({ imageId, onSubmit, disabled = false, clas
             </>
           ) : success ? (
             'Rating Submitted!'
+          ) : disabled ? (
+            'Rating Disabled'
           ) : (
             `Submit Rating: ${currentRating.toFixed(2)}`
           )}
@@ -203,5 +206,25 @@ export default function RatingSlider({ imageId, onSubmit, disabled = false, clas
         )}
       </CardContent>
     </Card>
+  );
+}
+
+// Export with Error Boundary wrapper
+export default function RatingSlider(props: RatingSliderProps) {
+  return (
+    <ErrorBoundary 
+      fallback={
+        <Card className="w-full max-w-md mx-auto">
+          <CardContent className="p-6 text-center">
+            <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-4" />
+            <p className="text-sm text-muted-foreground">
+              Unable to load rating component. Please refresh the page.
+            </p>
+          </CardContent>
+        </Card>
+      }
+    >
+      <RatingSliderComponent {...props} />
+    </ErrorBoundary>
   );
 }

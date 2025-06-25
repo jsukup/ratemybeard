@@ -97,18 +97,18 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
   const [activeCategory, setActiveCategory] = useState<CategoryName>("Smoke Shows");
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Categorize images by their category
-  const categorizedImages = images.reduce((acc, image) => {
+  // Categorize images by their category (with safety check)
+  const categorizedImages = Array.isArray(images) ? images.reduce((acc, image) => {
     const category = image.category as CategoryName;
     if (!acc[category]) acc[category] = [];
     acc[category].push(image);
     return acc;
-  }, {} as Record<CategoryName, LeaderboardImage[]>);
+  }, {} as Record<CategoryName, LeaderboardImage[]>) : {} as Record<CategoryName, LeaderboardImage[]>;
 
-  // Get stats for display
-  const totalImages = images.length;
-  const totalRatings = images.reduce((sum, img) => sum + img.rating_count, 0);
-  const averageRating = totalRatings > 0 
+  // Get stats for display (with safety checks)
+  const totalImages = Array.isArray(images) ? images.length : 0;
+  const totalRatings = Array.isArray(images) ? images.reduce((sum, img) => sum + img.rating_count, 0) : 0;
+  const averageRating = totalRatings > 0 && Array.isArray(images)
     ? images.reduce((sum, img) => sum + (img.median_score * img.rating_count), 0) / totalRatings 
     : 0;
 
@@ -122,18 +122,18 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
         throw new Error('Database connection not configured. Please check your environment variables.');
       }
 
-      const data = await getLeaderboardData({
+      const result = await getLeaderboardData({
         minRatings: MIN_RATINGS_FOR_RANKING,
         limit: 1000,
         sortBy: 'created_at',
         sortOrder: 'desc'
       });
 
-      if (data === null) {
+      if (result === null) {
         throw new Error('Failed to fetch leaderboard data');
       }
 
-      setImages(data);
+      setImages(result.data || []);
 
     } catch (err) {
       console.error('Error fetching leaderboard:', err);

@@ -1,0 +1,66 @@
+<context>
+# Feature Overview
+[Describe the new feature you want to add. Include:
+- What problem this feature solves
+- How it fits into the existing product
+- What value it provides to users]
+
+# Integration Points
+[Identify how this feature connects with existing system:
+- Which existing components/pages will be affected
+- What data models or APIs need to be extended
+- How it fits into current user flows]
+
+# User Impact
+[Describe the user experience for this feature:
+- How users will discover and access the feature
+- Step-by-step user interaction flow
+- How it enhances existing functionality]
+</context>
+<PRD>
+# Technical Implementation
+[Detail the technical approach:
+- New components or modules to be created
+- Existing code that needs modification
+- Database schema changes (if any)
+- API endpoints to add or modify
+- Third-party integrations required]
+
+# Development Steps
+[Break down implementation into atomic tasks:
+- Foundation/setup tasks
+- Core functionality implementation
+- UI/UX components
+- Integration with existing features
+- Testing and validation
+- Each step should be independently implementable]
+
+# Dependencies and Prerequisites
+[Identify what must be completed first:
+- Existing features that must be working
+- Required data or infrastructure
+- Any blocking issues to resolve
+- Order of implementation for sub-features]
+
+# Testing Strategy
+[Define how to validate the feature:
+- Unit tests needed
+- Integration test scenarios
+- User acceptance criteria
+- Performance considerations
+- Edge cases to handle]
+
+# Future Enhancements
+[Consider what could be built on top of this feature:
+- Potential extensions or improvements
+- Related features that could follow
+- Scalability considerations]
+
+# Risks and Mitigations
+[Identify potential challenges:
+- Technical complexity areas
+- Integration risks with existing code
+- User experience concerns
+- Performance impact
+- Mitigation strategies for each risk]
+</PRD>

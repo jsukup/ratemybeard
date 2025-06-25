@@ -187,14 +187,14 @@ export async function getImageStatistics(imageId: string): Promise<{
       const lowerCount = lowerRankingImages.length;
       
       if (totalCount > 0) {
-        percentile = Math.round(((totalCount - lowerCount) / totalCount) * 100);
+        percentile = Math.round((lowerCount / totalCount) * 100);
         
-        // Determine category based on percentile
-        if (percentile >= 90) category = "Smoke Shows";
-        else if (percentile >= 70) category = "Monets";
+        // Determine category based on percentile (higher percentile = better ranking)
+        if (percentile >= 90) category = "Dregs";
+        else if (percentile >= 70) category = "Plebs";  
         else if (percentile >= 30) category = "Mehs";
-        else if (percentile >= 10) category = "Plebs";
-        else category = "Dregs";
+        else if (percentile >= 10) category = "Monets";
+        else category = "Smoke Shows";
       }
     }
 
@@ -245,33 +245,62 @@ export function validateRating(rating: any): { valid: boolean; error?: string; n
 export async function getLeaderboardData(options: {
   minRatings?: number;
   limit?: number;
+  offset?: number;
   sortBy?: 'median_score' | 'rating_count' | 'created_at';
   sortOrder?: 'asc' | 'desc';
-} = {}): Promise<Array<{
-  id: string;
-  username: string;
-  image_url: string;
-  median_score: number;
-  rating_count: number;
-  created_at: string;
-  category: string;
-}> | null> {
+  category?: string;
+} = {}): Promise<{
+  data: Array<{
+    id: string;
+    username: string;
+    image_url: string;
+    median_score: number;
+    rating_count: number;
+    created_at: string;
+    category: string;
+  }>;
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+} | null> {
   try {
     const {
       minRatings = 10,
-      limit = 1000,
+      limit = 50,
+      offset = 0,
       sortBy = 'created_at',
-      sortOrder = 'desc'
+      sortOrder = 'desc',
+      category
     } = options;
 
-    // Fetch images with minimum rating threshold
-    const query = supabase
+    // Calculate page number
+    const page = Math.floor(offset / limit) + 1;
+
+    // First, get total count for pagination
+    const { count: totalCount, error: countError } = await supabase
+      .from('images')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_visible', true)
+      .gte('rating_count', minRatings);
+
+    if (countError) {
+      console.error('Error getting total count:', countError);
+      return null;
+    }
+
+    // Fetch images with pagination
+    let query = supabase
       .from('images')
       .select('id, username, image_url, median_score, rating_count, created_at, is_visible')
       .eq('is_visible', true)
       .gte('rating_count', minRatings)
       .order(sortBy, { ascending: sortOrder === 'asc' })
-      .limit(limit);
+      .range(offset, offset + limit - 1);
 
     const { data: images, error } = await query;
 
@@ -280,38 +309,88 @@ export async function getLeaderboardData(options: {
       return null;
     }
 
+    const total = totalCount || 0;
+    const totalPages = Math.ceil(total / limit);
+
     if (!images || images.length === 0) {
-      return [];
-    }
-
-    // Sort by median score for category assignment
-    const sortedByScore = [...images].sort((a, b) => (b.median_score || 0) - (a.median_score || 0));
-    const total = sortedByScore.length;
-
-    // Assign categories based on percentiles
-    const categorizedImages = sortedByScore.map((image, index) => {
-      const percentile = ((total - index) / total) * 100;
-      
-      let category: string;
-      if (percentile >= 90) category = "Smoke Shows";
-      else if (percentile >= 70) category = "Monets";
-      else if (percentile >= 30) category = "Mehs";
-      else if (percentile >= 10) category = "Plebs";
-      else category = "Dregs";
-
       return {
-        ...image,
-        category,
+        data: [],
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages,
+          hasNext: false,
+          hasPrev: false,
+        },
       };
-    });
-
-    // Return in original sort order if not sorting by median_score
-    if (sortBy !== 'median_score') {
-      const imageMap = new Map(categorizedImages.map(img => [img.id, img]));
-      return images.map(img => imageMap.get(img.id)!).filter(Boolean);
     }
 
-    return categorizedImages;
+    // For category assignment, we need global rankings, not just current page
+    // Get all images to calculate proper percentiles
+    const { data: allImages, error: allImagesError } = await supabase
+      .from('images')
+      .select('id, median_score')
+      .eq('is_visible', true)
+      .gte('rating_count', minRatings)
+      .order('median_score', { ascending: false });
+
+    if (allImagesError) {
+      console.error('Error fetching all images for categorization:', allImagesError);
+      // Fall back to returning data without categories
+      const dataWithoutCategories = images.map(img => ({ ...img, category: 'Unknown' }));
+      return {
+        data: dataWithoutCategories,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages,
+          hasNext: page < totalPages,
+          hasPrev: page > 1,
+        },
+      };
+    }
+
+    // Create a map of image ID to category based on global ranking
+    const categoryMap = new Map<string, string>();
+    if (allImages) {
+      allImages.forEach((image, index) => {
+        const percentile = (index / allImages.length) * 100;
+        
+        let category: string;
+        if (percentile >= 90) category = "Dregs";
+        else if (percentile >= 70) category = "Plebs";
+        else if (percentile >= 30) category = "Mehs";  
+        else if (percentile >= 10) category = "Monets";
+        else category = "Smoke Shows";
+
+        categoryMap.set(image.id, category);
+      });
+    }
+
+    // Assign categories to current page images
+    const categorizedImages = images.map(image => ({
+      ...image,
+      category: categoryMap.get(image.id) || 'Unknown',
+    }));
+
+    // Filter by category if specified
+    const filteredImages = category 
+      ? categorizedImages.filter(img => img.category === category)
+      : categorizedImages;
+
+    return {
+      data: filteredImages,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    };
     
   } catch (error) {
     console.error('Error in getLeaderboardData:', error);

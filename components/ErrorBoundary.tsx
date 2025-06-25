@@ -207,7 +207,7 @@ ${JSON.stringify(bugReport, null, 2)}
                 Oops! Something went wrong
               </CardTitle>
               <CardDescription className="text-lg">
-                We're sorry, but something unexpected happened. Don't worry - your data is safe.
+                We&apos;re sorry, but something unexpected happened. Don&apos;t worry - your data is safe.
               </CardDescription>
             </CardHeader>
 
