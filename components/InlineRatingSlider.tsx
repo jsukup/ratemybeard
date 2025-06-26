@@ -45,11 +45,16 @@ export function InlineRatingSlider({
       const sessionId = getOrCreateSessionId();
       console.log('Using session ID:', sessionId);
 
+      // Validate sessionId before using it in headers
+      if (!sessionId || typeof sessionId !== 'string' || sessionId.trim() === '') {
+        throw new Error('Invalid session ID');
+      }
+
       const response = await fetch('/api/ratings/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-session-id': sessionId,
+          'x-session-id': sessionId.trim(),
         },
         body: JSON.stringify({
           imageId: imageId,

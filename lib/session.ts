@@ -24,7 +24,29 @@ export function getOrCreateSessionId(): string {
     localStorage.setItem(SESSION_KEY, sessionId);
   }
   
+  // Validate session ID to ensure it's safe for HTTP headers
+  if (!isValidHeaderValue(sessionId)) {
+    console.error('Invalid session ID detected, generating new one');
+    sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem(SESSION_KEY, sessionId);
+  }
+  
   return sessionId;
+}
+
+/**
+ * Validate if a string is safe to use as an HTTP header value
+ * @param value String to validate
+ * @returns boolean indicating if the value is valid
+ */
+function isValidHeaderValue(value: string | null): boolean {
+  if (!value || typeof value !== 'string') {
+    return false;
+  }
+  
+  // HTTP header values must be ASCII and not contain control characters
+  // eslint-disable-next-line no-control-regex
+  return /^[\x20-\x7E]*$/.test(value) && value.length > 0 && value.length < 8192;
 }
 
 /**

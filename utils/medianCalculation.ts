@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 /**
  * Calculate median from an array of numbers
@@ -269,6 +269,12 @@ export async function getLeaderboardData(options: {
   };
 } | null> {
   try {
+    // Check if Supabase is properly configured
+    if (!isSupabaseConfigured()) {
+      console.error('Supabase not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.');
+      return null;
+    }
+
     const {
       minRatings = 10,
       limit = 50,
