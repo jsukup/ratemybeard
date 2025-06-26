@@ -2,12 +2,29 @@ import { createClient } from '@supabase/supabase-js';
 
 // Initialize with placeholder values if env vars are not set
 // This allows the app to build even without proper environment variables
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder-url.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+// Clean environment variables to remove any whitespace/newlines that cause header errors
+const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder-url.supabase.co').trim().replace(/\s+/g, '');
+const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key').trim().replace(/\s+/g, '');
 
-// Log a warning if environment variables are missing
+// Log a warning if environment variables are missing or problematic
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
   console.warn('Supabase environment variables are missing. Using placeholder values. Database operations will fail.');
+} else {
+  // Check for common environment variable issues
+  const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const rawKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (rawUrl !== rawUrl.trim() || rawKey !== rawKey.trim()) {
+    console.warn('Supabase environment variables contain leading/trailing whitespace. This has been automatically cleaned.');
+  }
+  
+  if (rawUrl.includes('\n') || rawKey.includes('\n')) {
+    console.warn('Supabase environment variables contain newline characters. This has been automatically cleaned.');
+  }
+  
+  if (rawUrl.includes(' ') || rawKey.includes(' ')) {
+    console.warn('Supabase environment variables contain spaces. This has been automatically cleaned.');
+  }
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
