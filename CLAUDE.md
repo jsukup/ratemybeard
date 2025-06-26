@@ -79,6 +79,12 @@ The application is being transformed to include:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anonymous key
 - Database connection variables for rating system
 
+**CRITICAL VERCEL DEPLOYMENT NOTE:**
+Environment variables MUST be configured in the Vercel Dashboard for production deployments. The `vercel.json` env settings are not always reliable for Next.js applications. Always add environment variables through:
+1. Vercel Dashboard → Project → Settings → Environment Variables
+2. Add variables for Production, Preview, and Development environments
+3. Redeploy after adding variables to ensure they take effect
+
 ### Important Files
 - `vercel.json`: Vercel deployment configuration
 - `package.json`: Frontend dependencies (AI packages being removed)
@@ -146,3 +152,41 @@ The codebase is being updated through Claude TaskMaster with 12 main tasks:
 - Maintain existing Supabase integration patterns
 - Ad integration patterns should be preserved
 - Performance optimizations are critical for leaderboard scalability
+
+## Vercel Deployment Troubleshooting
+
+### Common Issues and Solutions
+
+#### Database Connection Errors
+If you encounter "Database connection not configured" errors on Vercel:
+
+1. **Environment Variables**: Ensure Supabase environment variables are set in Vercel Dashboard
+   - Go to Vercel Dashboard → Project → Settings → Environment Variables
+   - Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - Set for Production, Preview, and Development environments
+
+2. **Database Schema Mismatch**: Verify the database migration has been applied
+   - Run any pending migrations on the production Supabase instance
+   - Ensure the deployed code matches the database schema
+
+3. **Vercel Cache**: Clear build cache if issues persist
+   - In Vercel Dashboard → Deployments → Redeploy
+   - Uncheck "Use existing Build Cache" for fresh deployment
+
+#### Environment Variable Priority
+1. **Vercel Dashboard variables** (highest priority - most reliable)
+2. `vercel.json` env section (lower priority - sometimes unreliable)
+3. `.env` files (local development only)
+
+#### Best Practices
+- Always set environment variables in Vercel Dashboard for production
+- Use `vercel.json` only for build configuration and function timeouts
+- Test deployments after any environment variable changes
+
+## Accessing Screenshots from Windows
+
+When working with screenshots or files from Windows in this WSL2 environment:
+
+- Windows files are accessible through `/mnt/c/`
+- Example: `C:\Users\[username]\Pictures\Screenshots\file.png` becomes `/mnt/c/Users/[username]/Pictures/Screenshots/file.png`
+- Always use the `/mnt/c/` prefix when accessing Windows files
