@@ -16,7 +16,7 @@ interface ImageModalProps {
     rating_count: number;
     created_at: string;
   };
-  rank: number;
+  rank: number | null;
 }
 
 export function ImageModal({ isOpen, onClose, image, rank }: ImageModalProps) {
@@ -157,9 +157,15 @@ export function ImageModal({ isOpen, onClose, image, rank }: ImageModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-3">
-            <Badge variant="secondary" className="font-semibold">
-              #{rank}
-            </Badge>
+            {rank ? (
+              <Badge variant="secondary" className="font-semibold">
+                #{rank}
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="font-semibold">
+                New Upload
+              </Badge>
+            )}
             <h2 className="text-xl font-semibold">{image.username}'s Image</h2>
           </div>
           <Button 
@@ -269,16 +275,23 @@ export function ImageModal({ isOpen, onClose, image, rank }: ImageModalProps) {
               {/* Rating */}
               <div className="flex items-center gap-2">
                 <Star className="h-4 w-4 text-yellow-500" />
-                <span className={`font-bold text-lg ${getRatingColor(image.median_score)}`}>
-                  {image.median_score.toFixed(2)}
-                </span>
+                {rank ? (
+                  <span className={`font-bold text-lg ${getRatingColor(image.median_score)}`}>
+                    {image.median_score.toFixed(2)}
+                  </span>
+                ) : (
+                  <span className="font-bold text-lg text-gray-500">
+                    Not yet rated
+                  </span>
+                )}
               </div>
               
               {/* Vote Count */}
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-gray-500" />
                 <span className="text-gray-700 font-medium">
-                  {image.rating_count} votes
+                  {image.rating_count} {image.rating_count === 1 ? 'vote' : 'votes'}
+                  {!rank && ` • Needs ${Math.max(0, 10 - image.rating_count)} more`}
                 </span>
               </div>
               
