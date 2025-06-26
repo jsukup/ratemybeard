@@ -33,13 +33,25 @@ export async function fetchImageRatings(imageId: string): Promise<number[]> {
       .order('rating', { ascending: true });
 
     if (error) {
-      console.error('Error fetching ratings:', error);
+      console.error('Error fetching ratings:', {
+        message: error?.message || 'Unknown error',
+        details: error?.details || 'No details available',
+        hint: error?.hint || 'No hint available',
+        code: error?.code || 'No code available',
+        fullError: JSON.stringify(error, null, 2)
+      });
       throw error;
     }
 
     return ratings ? ratings.map(r => r.rating) : [];
   } catch (error) {
-    console.error('Error in fetchImageRatings:', error);
+    console.error('Error in fetchImageRatings:', {
+      message: error?.message || 'Unknown error',
+      details: error?.details || 'No details available',
+      hint: error?.hint || 'No hint available',
+      code: error?.code || 'No code available',
+      fullError: JSON.stringify(error, null, 2)
+    });
     return [];
   }
 }
@@ -69,7 +81,13 @@ export async function updateImageMedianScore(imageId: string): Promise<{
       .eq('id', imageId);
 
     if (updateError) {
-      console.error('Error updating image median score:', updateError);
+      console.error('Error updating image median score:', {
+        message: updateError?.message || 'Unknown error',
+        details: updateError?.details || 'No details available',
+        hint: updateError?.hint || 'No hint available',
+        code: updateError?.code || 'No code available',
+        fullError: JSON.stringify(updateError, null, 2)
+      });
       throw updateError;
     }
 
@@ -77,7 +95,13 @@ export async function updateImageMedianScore(imageId: string): Promise<{
     return { median, count };
     
   } catch (error) {
-    console.error('Error in updateImageMedianScore:', error);
+    console.error('Error in updateImageMedianScore:', {
+      message: error?.message || 'Unknown error',
+      details: error?.details || 'No details available',
+      hint: error?.hint || 'No hint available',
+      code: error?.code || 'No code available',
+      fullError: JSON.stringify(error, null, 2)
+    });
     return null;
   }
 }
@@ -147,7 +171,13 @@ export async function getImageStatistics(imageId: string): Promise<{
       .single();
 
     if (imageError || !imageData) {
-      console.error('Error fetching image data:', imageError);
+      console.error('Error fetching image data:', {
+        message: imageError?.message || 'Unknown error',
+        details: imageError?.details || 'No details available',
+        hint: imageError?.hint || 'No hint available',
+        code: imageError?.code || 'No code available',
+        fullError: JSON.stringify(imageError, null, 2)
+      });
       return null;
     }
 
@@ -169,7 +199,13 @@ export async function getImageStatistics(imageId: string): Promise<{
       .gte('rating_count', 10); // Only consider images with minimum ratings
 
     if (rankError) {
-      console.error('Error calculating percentile:', rankError);
+      console.error('Error calculating percentile:', {
+        message: rankError?.message || 'Unknown error',
+        details: rankError?.details || 'No details available',
+        hint: rankError?.hint || 'No hint available',
+        code: rankError?.code || 'No code available',
+        fullError: JSON.stringify(rankError, null, 2)
+      });
     }
 
     // Get total count of eligible images for ranking
@@ -205,7 +241,13 @@ export async function getImageStatistics(imageId: string): Promise<{
     };
     
   } catch (error) {
-    console.error('Error in getImageStatistics:', error);
+    console.error('Error in getImageStatistics:', {
+      message: error?.message || 'Unknown error',
+      details: error?.details || 'No details available',
+      hint: error?.hint || 'No hint available',
+      code: error?.code || 'No code available',
+      fullError: JSON.stringify(error, null, 2)
+    });
     return null;
   }
 }
@@ -270,6 +312,15 @@ export async function getLeaderboardData(options: {
 } | null> {
   try {
     // Check if Supabase is properly configured
+    console.log('Environment check:', {
+      NODE_ENV: process.env.NODE_ENV,
+      SUPABASE_URL_SET: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      SUPABASE_KEY_SET: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      SUPABASE_URL_LENGTH: process.env.NEXT_PUBLIC_SUPABASE_URL?.length || 0,
+      SUPABASE_KEY_LENGTH: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length || 0,
+      SUPABASE_URL_PREFIX: process.env.NEXT_PUBLIC_SUPABASE_URL?.slice(0, 20) + '...',
+    });
+    
     if (!isSupabaseConfigured()) {
       console.error('Supabase not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.');
       return null;
@@ -303,7 +354,13 @@ export async function getLeaderboardData(options: {
     const { count: totalCount, error: countError } = await countQuery;
 
     if (countError) {
-      console.error('Error getting total count:', countError);
+      console.error('Error getting total count:', {
+        message: countError.message || 'Unknown error',
+        details: countError.details || 'No details available',
+        hint: countError.hint || 'No hint available',
+        code: countError.code || 'No code available',
+        fullError: JSON.stringify(countError, null, 2)
+      });
       return null;
     }
 
@@ -326,7 +383,13 @@ export async function getLeaderboardData(options: {
     const { data: images, error } = await query;
 
     if (error) {
-      console.error('Error fetching leaderboard data:', error);
+      console.error('Error fetching leaderboard data:', {
+        message: error?.message || 'Unknown error',
+        details: error?.details || 'No details available',
+        hint: error?.hint || 'No hint available',
+        code: error?.code || 'No code available',
+        fullError: JSON.stringify(error, null, 2)
+      });
       return null;
     }
 
@@ -363,7 +426,13 @@ export async function getLeaderboardData(options: {
       .order('median_score', { ascending: false });
 
     if (allImagesError) {
-      console.error('Error fetching all images for categorization:', allImagesError);
+      console.error('Error fetching all images for categorization:', {
+        message: allImagesError?.message || 'Unknown error',
+        details: allImagesError?.details || 'No details available',
+        hint: allImagesError?.hint || 'No hint available',
+        code: allImagesError?.code || 'No code available',
+        fullError: JSON.stringify(allImagesError, null, 2)
+      });
       // Fall back to returning data without categories
       const dataWithoutCategories = images.map(img => ({ ...img, category: 'Unknown' }));
       return {
@@ -430,7 +499,13 @@ export async function getLeaderboardData(options: {
     };
     
   } catch (error) {
-    console.error('Error in getLeaderboardData:', error);
+    console.error('Error in getLeaderboardData:', {
+      message: error?.message || 'Unknown error',
+      details: error?.details || 'No details available',
+      hint: error?.hint || 'No hint available',
+      code: error?.code || 'No code available',
+      fullError: JSON.stringify(error, null, 2)
+    });
     return null;
   }
 }
