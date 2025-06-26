@@ -17,6 +17,11 @@ import { AlertCircle, Star, Trophy, Users, TrendingUp } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AdContainer } from "@/components/AdScript";
 import { getLeaderboardData } from "@/utils/medianCalculation";
+import { getRatingColor, getRatingBgColor } from "@/lib/utils";
+import { InlineRatingSlider } from "@/components/InlineRatingSlider";
+import { getOrCreateSessionId } from "@/lib/session";
+import { ImageModal } from "@/components/ImageModal";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Updated interface for the new rating system
 interface LeaderboardImage {
@@ -104,6 +109,8 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
   const [error, setError] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<CategoryName>("Newest");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<LeaderboardImage | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Categorize images by their category (with safety check)
   const categorizedImages = Array.isArray(images) ? images.reduce((acc, image) => {
@@ -331,9 +338,10 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                             <TableHead className="w-12 text-xs">Rank</TableHead>
                             <TableHead className="w-16 sm:w-20 text-xs">Image</TableHead>
                             <TableHead className="text-xs">Username</TableHead>
+                            <TableHead className="text-center text-xs min-w-[200px] hidden sm:table-cell">Rate</TableHead>
+                            <TableHead className="text-center text-xs sm:hidden">Rate</TableHead>
                             <TableHead className="text-center text-xs">Rating</TableHead>
                             <TableHead className="text-center text-xs hidden sm:table-cell">Votes</TableHead>
-                            <TableHead className="text-center text-xs hidden md:table-cell">Submitted</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -350,12 +358,16 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                   #{globalRank}
                                 </TableCell>
                                 <TableCell>
-                                  <div className="relative">
+                                  <div className="relative group">
                                     <img 
                                       src={image.image_url} 
                                       alt={`${image.username}'s submission`}
-                                      className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg"
+                                      className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg transition-all duration-300 ease-in-out hover:scale-[2.5] hover:z-50 hover:shadow-2xl cursor-pointer relative"
                                       loading="lazy"
+                                      onClick={() => {
+                                        setSelectedImage(image);
+                                        setIsModalOpen(true);
+                                      }}
                                     />
                                     {isNewSubmission && (
                                       <Badge className="absolute -top-2 -right-2 text-xs bg-green-500">
@@ -367,15 +379,164 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                 <TableCell className="font-medium text-xs sm:text-sm max-w-24 truncate">
                                   {image.username}
                                 </TableCell>
+                                <TableCell className="text-center hidden sm:table-cell min-w-[200px]">
+                                  {image.isUnrated || image.rating_count < MIN_RATINGS_FOR_RANKING ? (
+                                    <ErrorBoundary>
+                                      <InlineRatingSlider 
+                                        imageId={image.id}
+                                        onRatingSubmit={(rating, updatedStats) => {
+                                          console.log('Rating submitted successfully:', rating);
+                                          console.log('Updated stats received:', updatedStats);
+                                          
+                                          if (updatedStats) {
+                                            // Optimistic update - immediately update the image data
+                                            setImages(prevImages => 
+                                              prevImages.map(img => 
+                                                img.id === image.id 
+                                                  ? { 
+                                                      ...img, 
+                                                      rating_count: updatedStats.rating_count,
+                                                      median_score: updatedStats.median_score 
+                                                    }
+                                                  : img
+                                              )
+                                            );
+                                          }
+                                          
+                                          // Also trigger full refresh to ensure consistency
+                                          setTimeout(() => {
+                                            setRefreshKey(prev => prev + 1);
+                                            console.log('Leaderboard refresh triggered');
+                                          }, 500);
+                                        }}
+                                        className="w-full max-w-[180px] mx-auto"
+                                      />
+                                    </ErrorBoundary>
+                                  ) : (
+                                    <div className="text-xs text-muted-foreground">
+                                      Already rated
+                                    </div>
+                                  )}
+                                </TableCell>
+                                {/* Mobile rating button - shows when rate column is hidden */}
+                                <TableCell className="text-center sm:hidden">
+                                  {image.isUnrated || image.rating_count < MIN_RATINGS_FOR_RANKING ? (
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline"
+                                      className="text-xs"
+                                      onClick={() => {
+                                        // Show mobile rating modal
+                                        const modal = document.createElement('div');
+                                        modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4';
+                                        modal.onclick = () => modal.remove();
+                                        
+                                        const content = document.createElement('div');
+                                        content.className = 'bg-white rounded-lg p-6 max-w-sm w-full';
+                                        content.onclick = (e) => e.stopPropagation();
+                                        
+                                        const title = document.createElement('h3');
+                                        title.textContent = `Rate ${image.username}'s image`;
+                                        title.className = 'text-lg font-semibold mb-4 text-center';
+                                        
+                                        const img = document.createElement('img');
+                                        img.src = image.image_url;
+                                        img.className = 'w-full h-48 object-cover rounded-lg mb-4';
+                                        
+                                        content.appendChild(title);
+                                        content.appendChild(img);
+                                        
+                                        // Add inline rating slider to modal
+                                        const ratingContainer = document.createElement('div');
+                                        ratingContainer.innerHTML = `
+                                          <div class="space-y-4">
+                                            <div class="text-center">
+                                              <span class="text-lg font-semibold" id="mobile-rating-display">5.00</span>
+                                            </div>
+                                            <input type="range" min="0" max="10" step="0.01" value="5" 
+                                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                   id="mobile-rating-slider">
+                                            <button class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600" 
+                                                    id="mobile-submit-btn">
+                                              Submit Rating
+                                            </button>
+                                          </div>
+                                        `;
+                                        
+                                        const slider = ratingContainer.querySelector('#mobile-rating-slider');
+                                        const display = ratingContainer.querySelector('#mobile-rating-display');
+                                        const submitBtn = ratingContainer.querySelector('#mobile-submit-btn');
+                                        
+                                        slider.addEventListener('input', (e) => {
+                                          display.textContent = parseFloat(e.target.value).toFixed(2);
+                                        });
+                                        
+                                        submitBtn.addEventListener('click', async () => {
+                                          const rating = parseFloat(slider.value);
+                                          try {
+                                            const sessionId = getOrCreateSessionId();
+                                            const response = await fetch('/api/ratings/submit', {
+                                              method: 'POST',
+                                              headers: { 
+                                                'Content-Type': 'application/json',
+                                                'x-session-id': sessionId
+                                              },
+                                              body: JSON.stringify({ imageId: image.id, rating })
+                                            });
+                                            if (response.ok) {
+                                              const result = await response.json();
+                                              console.log('Mobile rating submission successful:', result);
+                                              
+                                              if (result.updatedStats) {
+                                                // Optimistic update for mobile rating too
+                                                setImages(prevImages => 
+                                                  prevImages.map(img => 
+                                                    img.id === image.id 
+                                                      ? { 
+                                                          ...img, 
+                                                          rating_count: result.updatedStats.rating_count,
+                                                          median_score: result.updatedStats.median_score 
+                                                        }
+                                                      : img
+                                                  )
+                                                );
+                                              }
+                                              
+                                              modal.remove();
+                                              setTimeout(() => setRefreshKey(prev => prev + 1), 500);
+                                            } else {
+                                              const errorData = await response.json();
+                                              console.error('Rating submission failed:', errorData.error);
+                                              alert('Failed to submit rating: ' + errorData.error);
+                                            }
+                                          } catch (error) {
+                                            console.error('Rating submission failed:', error);
+                                            alert('Failed to submit rating. Please try again.');
+                                          }
+                                        });
+                                        
+                                        content.appendChild(ratingContainer);
+                                        modal.appendChild(content);
+                                        document.body.appendChild(modal);
+                                      }}
+                                    >
+                                      Rate
+                                    </Button>
+                                  ) : (
+                                    <div className="text-xs text-muted-foreground">
+                                      Rated
+                                    </div>
+                                  )}
+                                </TableCell>
                                 <TableCell className="text-center">
                                   {image.isUnrated || image.rating_count < MIN_RATINGS_FOR_RANKING ? (
                                     <Badge variant="outline" className="text-xs">
-                                      Needs {MIN_RATINGS_FOR_RANKING - image.rating_count} more ratings
+                                      Needs {Math.max(0, MIN_RATINGS_FOR_RANKING - image.rating_count)} more ratings
                                     </Badge>
                                   ) : (
                                     <div className="flex items-center justify-center gap-1">
                                       <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500" />
-                                      <span className="font-bold text-sm sm:text-lg">
+                                      <span className={getRatingColor(image.median_score)}>
                                         {image.median_score.toFixed(2)}
                                       </span>
                                     </div>
@@ -385,9 +546,6 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                   <Badge variant="outline" className="text-xs">
                                     {image.rating_count}
                                   </Badge>
-                                </TableCell>
-                                <TableCell className="text-center text-xs text-muted-foreground hidden md:table-cell">
-                                  {formatDate(image.created_at)}
                                 </TableCell>
                               </TableRow>
                             );
@@ -418,6 +576,19 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
         adFormat="horizontal"
         responsive={true}
       />
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <ImageModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedImage(null);
+          }}
+          image={selectedImage}
+          rank={images.findIndex(img => img.id === selectedImage.id) + 1}
+        />
+      )}
     </div>
   );
 }

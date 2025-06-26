@@ -65,7 +65,6 @@ export async function updateImageMedianScore(imageId: string): Promise<{
       .update({
         median_score: median,
         rating_count: count,
-        updated_at: new Date().toISOString(),
       })
       .eq('id', imageId);
 

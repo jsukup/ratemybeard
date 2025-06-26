@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { updateImageMedianScore } from '@/utils/medianCalculation';
 
 // Rate limiting: 50 ratings per day per IP
 const DAILY_RATING_LIMIT = 50;
@@ -129,11 +130,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update image statistics with proper error handling
+    // Update image statistics using JavaScript utility function
     let statsUpdateSuccess = false;
+    let updatedStats = null;
     try {
-      await updateImageStatistics(imageId);
-      statsUpdateSuccess = true;
+      console.log(`Updating statistics for image ${imageId}...`);
+      const result = await updateImageMedianScore(imageId);
+      if (result) {
+        updatedStats = {
+          median_score: result.median,
+          rating_count: result.count
+        };
+        statsUpdateSuccess = true;
+        console.log(`Statistics updated successfully:`, updatedStats);
+      } else {
+        throw new Error('updateImageMedianScore returned null');
+      }
     } catch (statsError) {
       console.error('Error updating image statistics:', statsError);
       // Log the error but don't fail the rating submission
@@ -150,6 +162,7 @@ export async function POST(request: NextRequest) {
         createdAt: insertedRating.created_at,
       },
       statsUpdated: statsUpdateSuccess,
+      updatedStats: updatedStats,
       message: statsUpdateSuccess 
         ? 'Rating submitted and leaderboard updated successfully!' 
         : 'Rating submitted successfully! Leaderboard will update shortly.',
@@ -164,23 +177,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Helper function to manually update image statistics
-async function updateImageStatistics(imageId: string) {
-  try {
-    // Call the database function we created in Task 2
-    const { error } = await supabase.rpc('update_image_stats', {
-      target_image_id: imageId
-    });
-
-    if (error) {
-      console.error('Error calling update_image_stats function:', error);
-      throw new Error(`Database function failed: ${error.message}`);
-    }
-  } catch (error) {
-    console.error('Error in updateImageStatistics:', error);
-    throw error; // Re-throw to be caught by calling function
-  }
-}
+// Note: Using JavaScript utility function updateImageMedianScore from utils/medianCalculation.ts
+// instead of database function due to missing database migrations
 
 // Handle other HTTP methods
 export async function GET() {
