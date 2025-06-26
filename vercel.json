@@ -4,24 +4,18 @@
   "outputDirectory": ".next",
   "framework": "nextjs",
   "functions": {
-    "app/api/ensemble/route.ts": {
-      "maxDuration": 60
+    "app/api/ratings/submit/route.ts": {
+      "maxDuration": 30
     },
-    "app/api/model-inference/route.ts": {
-      "maxDuration": 60
+    "app/api/reports/submit/route.ts": {
+      "maxDuration": 30
     },
-    "app/api/analyze/route.ts": {
-      "maxDuration": 60
+    "app/api/admin/reports/route.ts": {
+      "maxDuration": 30
     }
   },
   "env": {
-    "NEXT_PUBLIC_SUPABASE_URL": "https://skiobtldfnlwgkgsfwqz.supabase.co",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNraW9idGxkZm5sd2drZ3Nmd3F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyNjMxMzAsImV4cCI6MjA1NjgzOTEzMH0.fvCezYT99SpISIkFZyIxcI9sfE1RDUHXT6nN70dln7M", 
-    "NEXT_PUBLIC_API_URL": "https://looxmaxx-api.vercel.app",
-    "NEXT_PUBLIC_SCUT_MODEL_URL": "https://aklfusg8ssezal5z.public.blob.vercel-storage.com/ml-models/tfjs_scut/model-CC8gz0kPImCGCti3IujogFV1t84qze.json",
-    "NEXT_PUBLIC_MEBEAUTY_MODEL_URL": "https://aklfusg8ssezal5z.public.blob.vercel-storage.com/ml-models/tfjs_mebeauty/model-NjoN2IqsH4yKJA0Kd3S72w0IetdUXr.json",
-    "INTERNAL_API_KEY": "looxmaxx-7b924e71-6f37-4ea2-9f06-9a4eb15de9c2",
-    "SCUT_MODEL_SERVER_URL": "https://aklfusg8ssezal5z.public.blob.vercel-storage.com/ml-models/tfjs_scut/model-CC8gz0kPImCGCti3IujogFV1t84qze.json",
-    "MEBEAUTY_MODEL_SERVER_URL": "https://aklfusg8ssezal5z.public.blob.vercel-storage.com/ml-models/tfjs_mebeauty/model-NjoN2IqsH4yKJA0Kd3S72w0IetdUXr.json"
+    "NEXT_PUBLIC_SUPABASE_URL": "https://vaxbfvsgzqruuhnntrsy.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZheGJmdnNnenFydXVobm50cnN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyMDM1MTksImV4cCI6MjA2NTc3OTUxOX0.jFWE8JkcWU3YvYKSrndiqfkUlOz_Vik0XzUCLOvaOoI"
   }
 } 
