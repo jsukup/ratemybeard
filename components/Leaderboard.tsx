@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Star, Trophy, Users, TrendingUp, Sparkles } from "lucide-react";
+import { AlertCircle, Star, Trophy, Users, TrendingUp, Sparkles, Flag } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AdContainer } from "@/components/AdScript";
 import { getLeaderboardData } from "@/utils/medianCalculation";
@@ -21,6 +21,7 @@ import { getRatingColor, getRatingBgColor } from "@/lib/utils";
 import { InlineRatingSlider } from "@/components/InlineRatingSlider";
 import { getOrCreateSessionId } from "@/lib/session";
 import { ImageModal } from "@/components/ImageModal";
+import { ReportModal } from "@/components/ReportModal";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Updated interface for the new rating system
@@ -111,6 +112,8 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedImage, setSelectedImage] = useState<LeaderboardImage | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [reportImage, setReportImage] = useState<LeaderboardImage | null>(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   // Map old category names to new ones for backward compatibility
   const mapOldCategoryToNew = (oldCategory: string): CategoryName => {
@@ -406,6 +409,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                             <TableHead className="text-center text-xs sm:hidden">Rate</TableHead>
                             <TableHead className="text-center text-xs">Rating</TableHead>
                             <TableHead className="text-center text-xs hidden sm:table-cell">Votes</TableHead>
+                            <TableHead className="text-center text-xs">Flag</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -620,6 +624,20 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                     {image.rating_count}
                                   </Badge>
                                 </TableCell>
+                                <TableCell className="text-center">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-muted-foreground hover:text-red-500"
+                                    onClick={() => {
+                                      setReportImage(image);
+                                      setIsReportModalOpen(true);
+                                    }}
+                                    title="Report this image"
+                                  >
+                                    <Flag className="h-3 w-3" />
+                                  </Button>
+                                </TableCell>
                               </TableRow>
                             );
                           })}
@@ -660,6 +678,20 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
           }}
           image={selectedImage}
           rank={selectedImage.isUnrated || selectedImage.rating_count < MIN_RATINGS_FOR_RANKING ? null : images.findIndex(img => img.id === selectedImage.id) + 1}
+        />
+      )}
+
+      {/* Report Modal */}
+      {reportImage && (
+        <ReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => {
+            setIsReportModalOpen(false);
+            setReportImage(null);
+          }}
+          imageId={reportImage.id}
+          username={reportImage.username}
+          imageUrl={reportImage.image_url}
         />
       )}
 

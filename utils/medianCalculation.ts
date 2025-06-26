@@ -286,7 +286,8 @@ export async function getLeaderboardData(options: {
     let countQuery = supabase
       .from('images')
       .select('*', { count: 'exact', head: true })
-      .eq('is_visible', true);
+      .eq('is_visible', true)
+      .neq('moderation_status', 'hidden');
     
     // Only apply minimum ratings filter if not including unrated images
     if (!includeUnrated) {
@@ -304,7 +305,8 @@ export async function getLeaderboardData(options: {
     let query = supabase
       .from('images')
       .select('id, username, image_url, median_score, rating_count, created_at, is_visible')
-      .eq('is_visible', true);
+      .eq('is_visible', true)
+      .neq('moderation_status', 'hidden');
     
     // Only apply minimum ratings filter if not including unrated images
     if (!includeUnrated) {
