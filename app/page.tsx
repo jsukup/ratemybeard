@@ -373,9 +373,9 @@ function HomeContent() {
                     )}
                     
                     <div className="text-center mb-6">
-                      <h2 className="text-2xl font-bold mb-2">Upload Your Photo</h2>
+                      <h2 className="text-2xl font-bold mb-2">Show us Those Toes!</h2>
                       <p className="text-muted-foreground">
-                        Take a photo to share with the community for rating.
+                        Position your feet in the frame and click the Take Photo button
                       </p>
                     </div>
                     
