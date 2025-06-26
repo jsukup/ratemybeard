@@ -73,21 +73,21 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Jiggy Piggys", 
     icon: null, 
     color: "bg-gradient-to-r from-blue-500 to-cyan-500",
-    description: "Middle 31-70% - Standard attractiveness level"
+    description: "Middle 31-70% - Probably attracting some perv's attention"
   },
   { 
     name: "Below Average", 
     label: "Crows Toes", 
     icon: null, 
     color: "bg-gradient-to-r from-orange-500 to-red-400",
-    description: "Bottom 71-90% - Could use some improvement"
+    description: "Bottom 71-90% - Are you even human?"
   },
   { 
     name: "Needs Work", 
     label: "Puke", 
     icon: null, 
     color: "bg-gradient-to-r from-red-500 to-rose-600",
-    description: "Bottom 10% - Significant improvement needed"
+    description: "Bottom 10% - Consider amputation"
   },
 ];
 
@@ -368,8 +368,8 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
         </div>
         
         {/* Category Description */}
-        <div className="mb-4 p-4 bg-muted/50 rounded-lg border-l-4 border-primary">
-          <p className="text-sm text-muted-foreground">
+        <div className="mb-4 p-4 bg-card rounded-lg border-l-4 border-primary">
+          <p className="text-lg text-center italic">
             {CATEGORY_CONFIGS.find(c => c.name === activeCategory)?.description}
           </p>
         </div>
