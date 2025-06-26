@@ -15,20 +15,64 @@ export function getOrCreateSessionId(): string {
     return `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  // Client-side: try to get existing session ID
-  let sessionId = localStorage.getItem(SESSION_KEY);
+  // Client-side: try to get existing session ID with fallback for blocked localStorage
+  let sessionId = null;
   
+  // Try localStorage first
+  try {
+    sessionId = localStorage.getItem(SESSION_KEY);
+  } catch (error) {
+    console.warn('localStorage access blocked, using fallback session management:', error);
+  }
+  
+  // If no session ID or localStorage failed, try sessionStorage
   if (!sessionId) {
-    // Generate new session ID
+    try {
+      sessionId = sessionStorage.getItem(SESSION_KEY);
+    } catch (error) {
+      console.warn('sessionStorage access also blocked:', error);
+    }
+  }
+  
+  // If still no session ID, check for in-memory fallback
+  if (!sessionId && (window as any)._rateMyFeetSession) {
+    sessionId = (window as any)._rateMyFeetSession;
+  }
+  
+  // Generate new session ID if none exists
+  if (!sessionId) {
     sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem(SESSION_KEY, sessionId);
+    
+    // Try to store in localStorage first
+    try {
+      localStorage.setItem(SESSION_KEY, sessionId);
+    } catch (error) {
+      // If localStorage fails, try sessionStorage
+      try {
+        sessionStorage.setItem(SESSION_KEY, sessionId);
+      } catch (error2) {
+        // If both fail, store in memory as last resort
+        console.warn('Both localStorage and sessionStorage blocked, using in-memory session storage');
+        (window as any)._rateMyFeetSession = sessionId;
+      }
+    }
   }
   
   // Validate session ID to ensure it's safe for HTTP headers
   if (!isValidHeaderValue(sessionId)) {
     console.error('Invalid session ID detected, generating new one');
     sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem(SESSION_KEY, sessionId);
+    
+    // Store the new valid session ID
+    try {
+      localStorage.setItem(SESSION_KEY, sessionId);
+    } catch (error) {
+      try {
+        sessionStorage.setItem(SESSION_KEY, sessionId);
+      } catch (error2) {
+        (window as any)._rateMyFeetSession = sessionId;
+      }
+    }
   }
   
   return sessionId;
@@ -54,7 +98,21 @@ function isValidHeaderValue(value: string | null): boolean {
  */
 export function clearSession(): void {
   if (typeof window !== 'undefined') {
-    localStorage.removeItem(SESSION_KEY);
+    // Clear from all possible storage locations
+    try {
+      localStorage.removeItem(SESSION_KEY);
+    } catch (error) {
+      // localStorage might be blocked
+    }
+    
+    try {
+      sessionStorage.removeItem(SESSION_KEY);
+    } catch (error) {
+      // sessionStorage might be blocked
+    }
+    
+    // Clear in-memory storage
+    delete (window as any)._rateMyFeetSession;
   }
 }
 
@@ -67,5 +125,22 @@ export function getCurrentSessionId(): string | null {
     return null;
   }
   
-  return localStorage.getItem(SESSION_KEY);
+  // Try localStorage first
+  try {
+    const sessionId = localStorage.getItem(SESSION_KEY);
+    if (sessionId) return sessionId;
+  } catch (error) {
+    // localStorage might be blocked
+  }
+  
+  // Try sessionStorage
+  try {
+    const sessionId = sessionStorage.getItem(SESSION_KEY);
+    if (sessionId) return sessionId;
+  } catch (error) {
+    // sessionStorage might be blocked
+  }
+  
+  // Check in-memory storage
+  return (window as any)._rateMyFeetSession || null;
 }
