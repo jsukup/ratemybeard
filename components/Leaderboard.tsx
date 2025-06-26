@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Star, Trophy, Users, TrendingUp } from "lucide-react";
+import { AlertCircle, Star, Trophy, Users, TrendingUp, Sparkles, Flag } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AdContainer } from "@/components/AdScript";
 import { getLeaderboardData } from "@/utils/medianCalculation";
@@ -21,6 +21,7 @@ import { getRatingColor, getRatingBgColor } from "@/lib/utils";
 import { InlineRatingSlider } from "@/components/InlineRatingSlider";
 import { getOrCreateSessionId } from "@/lib/session";
 import { ImageModal } from "@/components/ImageModal";
+import { ReportModal } from "@/components/ReportModal";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Updated interface for the new rating system
@@ -35,12 +36,12 @@ interface LeaderboardImage {
   isUnrated?: boolean;
 }
 
-type CategoryName = "Newest" | "Smoke Shows" | "Monets" | "Mehs" | "Plebs" | "Dregs";
+type CategoryName = "Newest" | "Elite" | "Beautiful" | "Average" | "Below Average" | "Needs Work";
 
 interface CategoryConfig {
   name: CategoryName;
   label: string;
-  icon: React.ReactNode;
+  icon: React.ReactNode | null;
   color: string;
   description: string;
 }
@@ -48,45 +49,45 @@ interface CategoryConfig {
 const CATEGORY_CONFIGS: CategoryConfig[] = [
   { 
     name: "Newest", 
-    label: "🆕 Newest Uploads", 
-    icon: <TrendingUp className="h-4 w-4" />, 
-    color: "bg-green-500",
-    description: "Fresh uploads waiting for ratings!"
+    label: "Latest Uploads", 
+    icon: null, 
+    color: "bg-gradient-to-r from-emerald-500 to-green-500",
+    description: "Fresh uploads waiting for ratings - be the first to rate!"
   },
   { 
-    name: "Smoke Shows", 
-    label: "🔥 The Smoke Shows", 
-    icon: <Trophy className="h-4 w-4" />, 
-    color: "bg-yellow-500",
-    description: "Top 10% - Absolutely stunning!"
+    name: "Elite", 
+    label: "Elite Feet", 
+    icon: null, 
+    color: "bg-gradient-to-r from-yellow-400 to-amber-500",
+    description: "Top 10% - The absolute finest feet you'll find here"
   },
   { 
-    name: "Monets", 
-    label: "🎨 The Monets", 
-    icon: <Star className="h-4 w-4" />, 
-    color: "bg-purple-500",
-    description: "Top 11-30% - Beautiful from afar"
+    name: "Beautiful", 
+    label: "Keen Kicks", 
+    icon: null, 
+    color: "bg-gradient-to-r from-purple-500 to-pink-500",
+    description: "Top 11-30% - Genuinely attractive and well-maintained"
   },
   { 
-    name: "Mehs", 
-    label: "😐 The Mehs", 
-    icon: <Users className="h-4 w-4" />, 
-    color: "bg-blue-500",
-    description: "Middle 31-70% - Average attractiveness"
+    name: "Average", 
+    label: "Jiggy Piggys", 
+    icon: null, 
+    color: "bg-gradient-to-r from-blue-500 to-cyan-500",
+    description: "Middle 31-70% - Standard attractiveness level"
   },
   { 
-    name: "Plebs", 
-    label: "👎 The Plebs", 
-    icon: <TrendingUp className="h-4 w-4" />, 
-    color: "bg-orange-500",
-    description: "Bottom 71-90% - Below average"
+    name: "Below Average", 
+    label: "Crows Toes", 
+    icon: null, 
+    color: "bg-gradient-to-r from-orange-500 to-red-400",
+    description: "Bottom 71-90% - Could use some improvement"
   },
   { 
-    name: "Dregs", 
-    label: "💀 The Dregs", 
-    icon: <AlertCircle className="h-4 w-4" />, 
-    color: "bg-red-500",
-    description: "Bottom 10% - Needs improvement"
+    name: "Needs Work", 
+    label: "Puke", 
+    icon: null, 
+    color: "bg-gradient-to-r from-red-500 to-rose-600",
+    description: "Bottom 10% - Significant improvement needed"
   },
 ];
 
@@ -111,12 +112,27 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedImage, setSelectedImage] = useState<LeaderboardImage | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [reportImage, setReportImage] = useState<LeaderboardImage | null>(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
-  // Categorize images by their category (with safety check)
+  // Map old category names to new ones for backward compatibility
+  const mapOldCategoryToNew = (oldCategory: string): CategoryName => {
+    switch (oldCategory) {
+      case 'Smoke Shows': return 'Elite';
+      case 'Monets': return 'Beautiful';
+      case 'Mehs': return 'Average';
+      case 'Plebs': return 'Below Average';
+      case 'Dregs': return 'Needs Work';
+      case 'Newest': return 'Newest';
+      default: return 'Average'; // fallback
+    }
+  };
+
+  // Categorize images by their category (with safety check and mapping)
   const categorizedImages = Array.isArray(images) ? images.reduce((acc, image) => {
-    const category = image.category as CategoryName;
-    if (!acc[category]) acc[category] = [];
-    acc[category].push(image);
+    const mappedCategory = mapOldCategoryToNew(image.category);
+    if (!acc[mappedCategory]) acc[mappedCategory] = [];
+    acc[mappedCategory].push(image);
     return acc;
   }, {} as Record<CategoryName, LeaderboardImage[]>) : {} as Record<CategoryName, LeaderboardImage[]>;
 
@@ -301,24 +317,75 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
 
       {/* Category Navigation */}
       <Tabs value={activeCategory} onValueChange={(value) => setActiveCategory(value as CategoryName)}>
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1">
-          {CATEGORY_CONFIGS.map((config) => (
-            <TabsTrigger key={config.name} value={config.name} className="text-xs p-2 sm:p-3">
-              <span className="hidden md:inline">{config.icon}</span>
-              <span className="ml-0 md:ml-1 truncate">{config.name}</span>
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+          {CATEGORY_CONFIGS.map((config) => {
+            const isActive = activeCategory === config.name;
+            const categoryImages = categorizedImages[config.name] || [];
+            
+            return (
+              <button
+                key={config.name}
+                onClick={() => setActiveCategory(config.name)}
+                className={`
+                  relative group overflow-hidden rounded-xl p-4 sm:p-5 transition-all duration-300 ease-out
+                  transform hover:scale-105 hover:shadow-xl active:scale-95
+                  border-2 text-white font-semibold text-sm sm:text-base
+                  ${
+                    isActive 
+                      ? `${config.color} border-white shadow-lg scale-105` 
+                      : `${config.color} border-transparent opacity-80 hover:opacity-100`
+                  }
+                `}
+              >
+                {/* Background overlay for better text contrast */}
+                <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                
+                {/* Content */}
+                <div className="relative z-10 flex flex-col items-center space-y-2">
+                  {config.icon && (
+                    <div className="flex items-center justify-center">
+                      {config.icon}
+                    </div>
+                  )}
+                  <div className="text-center">
+                    <div className="font-bold leading-tight">{config.label}</div>
+                    <div className="text-xs opacity-90 mt-1">
+                      {categoryImages.length} {categoryImages.length === 1 ? 'image' : 'images'}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Active indicator */}
+                {isActive && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-white rounded-full"></div>
+                )}
+                
+                {/* Hover effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-10 bg-white transition-opacity duration-300"></div>
+              </button>
+            );
+          })}
+        </div>
+        
+        {/* Category Description */}
+        <div className="mb-4 p-4 bg-muted/50 rounded-lg border-l-4 border-primary">
+          <p className="text-sm text-muted-foreground">
+            {CATEGORY_CONFIGS.find(c => c.name === activeCategory)?.description}
+          </p>
+        </div>
 
         {CATEGORY_CONFIGS.map((config) => {
           const categoryImages = categorizedImages[config.name] || [];
+          const isActive = activeCategory === config.name;
+          
+          if (!isActive) return null;
           
           return (
-            <TabsContent key={config.name} value={config.name}>
+            <div key={config.name}>
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    {config.icon}
+                    {config.icon && config.icon}
                     {config.label}
                     <Badge variant="secondary">{categoryImages.length}</Badge>
                   </CardTitle>
@@ -342,11 +409,15 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                             <TableHead className="text-center text-xs sm:hidden">Rate</TableHead>
                             <TableHead className="text-center text-xs">Rating</TableHead>
                             <TableHead className="text-center text-xs hidden sm:table-cell">Votes</TableHead>
+                            <TableHead className="text-center text-xs">Flag</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {categoryImages.map((image, index) => {
-                            const globalRank = images.findIndex(img => img.id === image.id) + 1;
+                            // For "Newest" tab, don't show rankings since they're unrated
+                            // For other categories, show category-based ranking
+                            const isNewestTab = activeCategory === "Newest";
+                            const displayRank = isNewestTab ? null : index + 1;
                             const isNewSubmission = image.id === submittedEntryId;
                             
                             return (
@@ -355,7 +426,13 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                 className={isNewSubmission ? "bg-green-50 border-green-200" : ""}
                               >
                                 <TableCell className="font-medium text-xs">
-                                  #{globalRank}
+                                  {isNewestTab ? (
+                                    <Badge variant="outline" className="text-xs">
+                                      New
+                                    </Badge>
+                                  ) : (
+                                    `#${displayRank}`
+                                  )}
                                 </TableCell>
                                 <TableCell>
                                   <div className="relative group">
@@ -547,6 +624,20 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                     {image.rating_count}
                                   </Badge>
                                 </TableCell>
+                                <TableCell className="text-center">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-muted-foreground hover:text-red-500"
+                                    onClick={() => {
+                                      setReportImage(image);
+                                      setIsReportModalOpen(true);
+                                    }}
+                                    title="Report this image"
+                                  >
+                                    <Flag className="h-3 w-3" />
+                                  </Button>
+                                </TableCell>
                               </TableRow>
                             );
                           })}
@@ -556,7 +647,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                   )}
                 </CardContent>
               </Card>
-            </TabsContent>
+            </div>
           );
         })}
       </Tabs>
@@ -586,7 +677,21 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
             setSelectedImage(null);
           }}
           image={selectedImage}
-          rank={images.findIndex(img => img.id === selectedImage.id) + 1}
+          rank={selectedImage.isUnrated || selectedImage.rating_count < MIN_RATINGS_FOR_RANKING ? null : images.findIndex(img => img.id === selectedImage.id) + 1}
+        />
+      )}
+
+      {/* Report Modal */}
+      {reportImage && (
+        <ReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => {
+            setIsReportModalOpen(false);
+            setReportImage(null);
+          }}
+          imageId={reportImage.id}
+          username={reportImage.username}
+          imageUrl={reportImage.image_url}
         />
       )}
     </div>
