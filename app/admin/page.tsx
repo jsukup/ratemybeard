@@ -26,8 +26,18 @@ import {
   Clock,
   BarChart3,
   Users,
-  UserCheck
+  UserCheck,
+  Trash2
 } from "lucide-react";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface ReportDetails {
   id: string;
@@ -69,6 +79,11 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string>('');
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
   const [moderatorId, setModeratorId] = useState<string>('admin');
+  const [deleteConfirmImage, setDeleteConfirmImage] = useState<FlaggedImage | null>(null);
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
+  const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState<'approve' | 'hide' | 'delete' | null>(null);
+  const [bulkProcessing, setBulkProcessing] = useState<boolean>(false);
 
   const authenticate = async () => {
     if (!password.trim()) {
@@ -183,6 +198,182 @@ export default function AdminDashboard() {
         newSet.delete(imageId);
         return newSet;
       });
+    }
+  };
+
+  const handleDeletePermanently = async (imageId: string) => {
+    if (!moderatorId.trim()) {
+      setError('Please enter a moderator ID');
+      return;
+    }
+
+    setDeletingIds(prev => new Set(prev).add(imageId));
+    setError('');
+
+    try {
+      const response = await fetch('/api/admin/delete-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': password
+        },
+        body: JSON.stringify({
+          imageId: imageId,
+          moderatorId: moderatorId,
+          confirmDelete: true
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Remove the image from the flagged list
+        setFlaggedImages(prev => prev.filter(img => img.image_id !== imageId));
+        
+        // Close confirmation dialog
+        setDeleteConfirmImage(null);
+        
+        // Show success message
+        console.log('Image permanently deleted successfully');
+        
+        // Refresh stats
+        await refreshData();
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to delete image permanently');
+      }
+    } catch (err) {
+      setError('Network error while trying to delete image');
+      console.error('Delete image error:', err);
+    } finally {
+      setDeletingIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(imageId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleSelectImage = (imageId: string, checked: boolean) => {
+    setSelectedImages(prev => {
+      const newSet = new Set(prev);
+      if (checked) {
+        newSet.add(imageId);
+      } else {
+        newSet.delete(imageId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedImages(new Set(flaggedImages.map(img => img.image_id)));
+    } else {
+      setSelectedImages(new Set());
+    }
+  };
+
+  const handleBulkAction = async (action: 'approve' | 'hide' | 'delete') => {
+    if (selectedImages.size === 0) {
+      setError('No images selected for bulk action');
+      return;
+    }
+
+    if (!moderatorId.trim()) {
+      setError('Please enter a moderator ID');
+      return;
+    }
+
+    setBulkProcessing(true);
+    setError('');
+    
+    const selectedArray = Array.from(selectedImages);
+    const results = { success: 0, failed: 0, errors: [] as string[] };
+
+    try {
+      // Process images in batches of 3 to avoid overwhelming the server
+      for (let i = 0; i < selectedArray.length; i += 3) {
+        const batch = selectedArray.slice(i, i + 3);
+        const batchPromises = batch.map(async (imageId) => {
+          try {
+            let response;
+            
+            if (action === 'delete') {
+              response = await fetch('/api/admin/delete-image', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-admin-password': password
+                },
+                body: JSON.stringify({
+                  imageId: imageId,
+                  moderatorId: moderatorId,
+                  confirmDelete: true
+                })
+              });
+            } else {
+              response = await fetch('/api/admin/reports', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-admin-password': password
+                },
+                body: JSON.stringify({
+                  imageId: imageId,
+                  action: action,
+                  moderatorId: moderatorId
+                })
+              });
+            }
+
+            if (response.ok) {
+              results.success++;
+              return { imageId, success: true };
+            } else {
+              const errorData = await response.json();
+              results.failed++;
+              results.errors.push(`${imageId}: ${errorData.error || 'Unknown error'}`);
+              return { imageId, success: false, error: errorData.error };
+            }
+          } catch (err) {
+            results.failed++;
+            results.errors.push(`${imageId}: Network error`);
+            return { imageId, success: false, error: 'Network error' };
+          }
+        });
+
+        await Promise.all(batchPromises);
+        
+        // Small delay between batches
+        if (i + 3 < selectedArray.length) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+
+      // Remove successfully processed images from the list
+      setFlaggedImages(prev => prev.filter(img => !selectedImages.has(img.image_id)));
+      
+      // Clear selection
+      setSelectedImages(new Set());
+      
+      // Show results
+      if (results.success > 0) {
+        console.log(`Bulk ${action}: ${results.success} images processed successfully`);
+      }
+      
+      if (results.failed > 0) {
+        setError(`Bulk ${action}: ${results.success} succeeded, ${results.failed} failed. First error: ${results.errors[0]}`);
+      }
+      
+      // Refresh data
+      await refreshData();
+      
+    } catch (error) {
+      setError(`Bulk ${action} failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setBulkProcessing(false);
+      setBulkAction(null);
     }
   };
 
@@ -357,9 +548,50 @@ export default function AdminDashboard() {
         {/* Flagged Images Table */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Flag className="h-5 w-5" />
-              Flagged Images ({flaggedImages.length})
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Flag className="h-5 w-5" />
+                Flagged Images ({flaggedImages.length})
+              </div>
+              {selectedImages.size > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">
+                    {selectedImages.size} selected
+                  </span>
+                  <div className="flex gap-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-green-600 border-green-600 hover:bg-green-50"
+                      onClick={() => setBulkAction('approve')}
+                      disabled={bulkProcessing}
+                    >
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Approve
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-red-600 border-red-600 hover:bg-red-50"
+                      onClick={() => setBulkAction('hide')}
+                      disabled={bulkProcessing}
+                    >
+                      <EyeOff className="h-3 w-3 mr-1" />
+                      Hide
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-red-700 border-red-700 hover:bg-red-100"
+                      onClick={() => setBulkAction('delete')}
+                      disabled={bulkProcessing}
+                    >
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              )}
             </CardTitle>
             <CardDescription>
               Images that have been reported by users and require moderation
@@ -377,6 +609,13 @@ export default function AdminDashboard() {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={selectedImages.size === flaggedImages.length && flaggedImages.length > 0}
+                          onCheckedChange={(checked) => handleSelectAll(checked === true)}
+                          aria-label="Select all images"
+                        />
+                      </TableHead>
                       <TableHead>Image</TableHead>
                       <TableHead>Username</TableHead>
                       <TableHead>Reports</TableHead>
@@ -389,6 +628,14 @@ export default function AdminDashboard() {
                   <TableBody>
                     {flaggedImages.map((image) => (
                       <TableRow key={image.image_id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedImages.has(image.image_id)}
+                            onCheckedChange={(checked) => handleSelectImage(image.image_id, checked === true)}
+                            disabled={processingIds.has(image.image_id) || deletingIds.has(image.image_id)}
+                            aria-label={`Select image from ${image.username}`}
+                          />
+                        </TableCell>
                         <TableCell>
                           <img 
                             src={image.image_url} 
@@ -443,7 +690,8 @@ export default function AdminDashboard() {
                               variant="outline"
                               className="text-green-600 border-green-600 hover:bg-green-50"
                               onClick={() => handleModerationAction(image.image_id, 'approve')}
-                              disabled={processingIds.has(image.image_id)}
+                              disabled={processingIds.has(image.image_id) || deletingIds.has(image.image_id)}
+                              title="Approve image"
                             >
                               {processingIds.has(image.image_id) ? (
                                 <RefreshCw className="h-3 w-3 animate-spin" />
@@ -456,12 +704,27 @@ export default function AdminDashboard() {
                               variant="outline"
                               className="text-red-600 border-red-600 hover:bg-red-50"
                               onClick={() => handleModerationAction(image.image_id, 'hide')}
-                              disabled={processingIds.has(image.image_id)}
+                              disabled={processingIds.has(image.image_id) || deletingIds.has(image.image_id)}
+                              title="Hide image"
                             >
                               {processingIds.has(image.image_id) ? (
                                 <RefreshCw className="h-3 w-3 animate-spin" />
                               ) : (
                                 <EyeOff className="h-3 w-3" />
+                              )}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-red-700 border-red-700 hover:bg-red-100"
+                              onClick={() => setDeleteConfirmImage(image)}
+                              disabled={processingIds.has(image.image_id) || deletingIds.has(image.image_id)}
+                              title="Delete permanently (cannot be undone)"
+                            >
+                              {deletingIds.has(image.image_id) ? (
+                                <RefreshCw className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-3 w-3" />
                               )}
                             </Button>
                           </div>
@@ -475,6 +738,150 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteConfirmImage} onOpenChange={(open) => !open && setDeleteConfirmImage(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <Trash2 className="h-5 w-5" />
+              Permanently Delete Image
+            </DialogTitle>
+            <DialogDescription className="space-y-2">
+              <p className="font-medium text-red-700">
+                ⚠️ This action cannot be undone!
+              </p>
+              <p>
+                You are about to permanently delete this image and all related data:
+              </p>
+              {deleteConfirmImage && (
+                <div className="bg-gray-50 p-3 rounded-lg space-y-2">
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={deleteConfirmImage.image_url} 
+                      alt={`${deleteConfirmImage.username}'s submission`}
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                    <div>
+                      <p><strong>Username:</strong> {deleteConfirmImage.username}</p>
+                      <p><strong>Reports:</strong> {deleteConfirmImage.report_count}</p>
+                      <p><strong>Status:</strong> {deleteConfirmImage.moderation_status}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div className="text-sm text-muted-foreground">
+                <p><strong>This will permanently remove:</strong></p>
+                <ul className="list-disc list-inside ml-2 space-y-1">
+                  <li>The image record from the database</li>
+                  <li>All user ratings for this image</li>
+                  <li>All reports related to this image</li>
+                  <li>The image file from storage</li>
+                </ul>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setDeleteConfirmImage(null)}
+              disabled={deleteConfirmImage && deletingIds.has(deleteConfirmImage.image_id)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => deleteConfirmImage && handleDeletePermanently(deleteConfirmImage.image_id)}
+              disabled={deleteConfirmImage && deletingIds.has(deleteConfirmImage.image_id)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteConfirmImage && deletingIds.has(deleteConfirmImage.image_id) ? (
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  Deleting...
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Trash2 className="h-4 w-4" />
+                  Delete Permanently
+                </div>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Action Confirmation Dialog */}
+      <Dialog open={!!bulkAction} onOpenChange={(open) => !open && setBulkAction(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {bulkAction === 'approve' && <CheckCircle className="h-5 w-5 text-green-600" />}
+              {bulkAction === 'hide' && <EyeOff className="h-5 w-5 text-red-600" />}
+              {bulkAction === 'delete' && <Trash2 className="h-5 w-5 text-red-700" />}
+              Bulk {bulkAction === 'approve' ? 'Approve' : bulkAction === 'hide' ? 'Hide' : 'Delete'} Images
+            </DialogTitle>
+            <DialogDescription>
+              {bulkAction === 'delete' ? (
+                <div className="space-y-2">
+                  <p className="font-medium text-red-700">
+                    ⚠️ This action cannot be undone!
+                  </p>
+                  <p>
+                    You are about to permanently delete {selectedImages.size} image{selectedImages.size !== 1 ? 's' : ''} and all related data:
+                  </p>
+                  <div className="text-sm text-muted-foreground">
+                    <p><strong>This will permanently remove for each image:</strong></p>
+                    <ul className="list-disc list-inside ml-2">
+                      <li>The image record from the database</li>
+                      <li>All user ratings for this image</li>
+                      <li>All reports related to this image</li>
+                      <li>The image file from storage</li>
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <p>
+                  You are about to {bulkAction} {selectedImages.size} image{selectedImages.size !== 1 ? 's' : ''}.
+                  {bulkAction === 'hide' && ' Hidden images will be removed from the public leaderboard.'}
+                  {bulkAction === 'approve' && ' Approved images will be cleared of all flags and reports.'}
+                </p>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setBulkAction(null)}
+              disabled={bulkProcessing}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant={bulkAction === 'delete' ? 'destructive' : 'default'}
+              onClick={() => bulkAction && handleBulkAction(bulkAction)}
+              disabled={bulkProcessing}
+              className={bulkAction === 'delete' ? 'bg-red-600 hover:bg-red-700' : ''}
+            >
+              {bulkProcessing ? (
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  Processing...
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  {bulkAction === 'approve' && <CheckCircle className="h-4 w-4" />}
+                  {bulkAction === 'hide' && <EyeOff className="h-4 w-4" />}
+                  {bulkAction === 'delete' && <Trash2 className="h-4 w-4" />}
+                  {bulkAction === 'approve' ? 'Approve' : bulkAction === 'hide' ? 'Hide' : 'Delete'} {selectedImages.size} Image{selectedImages.size !== 1 ? 's' : ''}
+                </div>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
