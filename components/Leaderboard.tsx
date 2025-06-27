@@ -389,7 +389,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                     {config.label}
                     <Badge variant="secondary">{categoryImages.length}</Badge>
                   </CardTitle>
-                  <CardDescription>{config.description}</CardDescription>
+                  <CardDescription>Click on an image to see it full size</CardDescription>
                 </CardHeader>
                 
                 <CardContent>
