@@ -182,7 +182,7 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
     height: { ideal: 720 },
     aspectRatio: 16/9,
     deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined,
-    facingMode: "user"
+    facingMode: "environment"
   };
 
   return (
