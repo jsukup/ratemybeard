@@ -4,6 +4,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Camera } from "lucide-react";
 import Webcam from "react-webcam";
+import { isMobile } from 'react-device-detect';
 import { supabase } from '@/lib/supabase';
 import UsernameInput from './UsernameInput';
 
@@ -38,45 +39,35 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
   const [showFlash, setShowFlash] = React.useState(false);
   const [showUsernameInput, setShowUsernameInput] = React.useState(false);
   const [isUploading, setIsUploading] = React.useState(false);
+  const [webcamKey, setWebcamKey] = React.useState(0); // For component remounting
   
   const webcamRef = React.useRef<Webcam | null>(null);
 
 
-  // Request camera permission with progressive fallback strategy
-  async function getVideoDevices() {
-    try {
-      // Try rear camera first, but allow fallback to any camera
-      try {
-        await navigator.mediaDevices.getUserMedia({ 
-          video: { facingMode: { ideal: "environment" } }, 
-          audio: false 
-        });
-        console.log("Camera access successful - rear camera preferred");
-      } catch (rearCameraError) {
-        console.warn("Rear camera not available, trying any camera:", rearCameraError);
-        // Fallback to any available camera
-        await navigator.mediaDevices.getUserMedia({ 
-          video: true, 
-          audio: false 
-        });
-        console.log("Camera access successful - using available camera");
-      }
-    } catch (err) {
-      console.error("Error accessing any camera:", err);
-      const errorMessage = err instanceof Error ? err.message : "Unknown camera error";
-      
-      if (errorMessage.includes("Permission denied") || errorMessage.includes("NotAllowedError")) {
-        setError("Camera access denied. Please allow camera permissions and try again.");
-      } else if (errorMessage.includes("NotFoundError") || errorMessage.includes("No camera found")) {
-        setError("No camera found on this device.");
-      } else if (errorMessage.includes("NotReadableError")) {
-        setError("Camera is being used by another application. Please close other apps and try again.");
-      } else {
-        setError("Could not access camera. Please check permissions and try again.");
-      }
-      setHasPermission(false);
+  // Handle camera errors and remounting
+  const handleCameraError = (error: string | Error) => {
+    console.error("Camera error:", error);
+    const errorMessage = error instanceof Error ? error.message : error;
+    
+    if (errorMessage.includes("Permission denied") || errorMessage.includes("NotAllowedError")) {
+      setError("Camera access denied. Please allow camera permissions and try again.");
+    } else if (errorMessage.includes("NotFoundError") || errorMessage.includes("No camera found")) {
+      setError("No camera found on this device.");
+    } else if (errorMessage.includes("NotReadableError")) {
+      setError("Camera is being used by another application. Please close other apps and try again.");
+    } else {
+      setError("Could not access camera. Please check permissions and try again.");
     }
-  }
+    setHasPermission(false);
+  };
+
+  // Remount webcam component to reinitialize camera
+  const remountWebcam = () => {
+    console.log("Remounting webcam component");
+    setWebcamKey(prev => prev + 1);
+    setError(null);
+    setIsLoading(true);
+  };
 
   // Stop webcam stream
   function stopWebcam() {
@@ -85,27 +76,13 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
     }
   }
 
-  // Initialize webcam
-  async function initializeWebcam() {
-    setIsLoading(true);
+  // Handle successful camera initialization
+  const handleCameraReady = () => {
+    console.log(`Camera ready - Device: ${isMobile ? 'Mobile' : 'Desktop'}`);
+    setHasPermission(true);
+    setIsLoading(false);
     setError(null);
-    
-    try {
-      // Stop any existing stream
-      stopWebcam();
-      
-      // Get video devices and auto-select default camera
-      await getVideoDevices();
-      
-      setHasPermission(true);
-    } catch (err) {
-      console.error("Error accessing webcam:", err);
-      setError("Could not access webcam. Please check permissions.");
-      setHasPermission(false);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  };
 
 
 
@@ -163,40 +140,44 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
     onImageCapture?.(null);
     setShowUsernameInput(false);
     
-    // Re-initialize webcam
-    initializeWebcam();
+    // Remount webcam component for fresh initialization
+    remountWebcam();
   }
 
 
 
 
-  // Initialize webcam and get devices on component mount
+  // Initialize component
   React.useEffect(() => {
-    // Get video devices first
-    getVideoDevices().then(() => {
-      // Then initialize webcam
-      initializeWebcam();
-    });
-    
-    // Listen for device changes (e.g., when a camera is plugged in or removed)
-    navigator.mediaDevices.addEventListener('devicechange', getVideoDevices);
+    console.log(`Initializing camera component - Device: ${isMobile ? 'Mobile' : 'Desktop'}`);
+    setIsLoading(true);
     
     // Cleanup on unmount
     return () => {
       stopWebcam();
-      if (navigator.mediaDevices && navigator.mediaDevices.removeEventListener) {
-        navigator.mediaDevices.removeEventListener('devicechange', getVideoDevices);
-      }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const videoConstraints = {
-    width: { ideal: 1280 },
-    height: { ideal: 720 },
-    aspectRatio: 16/9,
-    facingMode: { ideal: "environment" }
-  };
+  // Device-specific camera constraints
+  const videoConstraints = React.useMemo(() => {
+    if (isMobile) {
+      // Mobile: Prefer rear camera for foot photography
+      return {
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        aspectRatio: 16/9,
+        facingMode: { ideal: "environment" }
+      };
+    } else {
+      // Desktop: Use default camera (usually built-in webcam)
+      return {
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        aspectRatio: 16/9,
+        facingMode: "user"
+      };
+    }
+  }, []);
 
   return (
     <div className="flex flex-col items-center gap-4 w-full">
@@ -213,7 +194,7 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
               <p className="text-destructive font-medium">{error}</p>
               <Button 
                 className="mt-3" 
-                onClick={initializeWebcam}
+                onClick={remountWebcam}
               >
                 Try Again
               </Button>
@@ -239,12 +220,14 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
               <p className="text-white text-lg">Camera access denied</p>
             ) : (
               <Webcam
+                key={webcamKey}
                 ref={webcamRef}
                 audio={false}
                 screenshotFormat="image/jpeg"
                 videoConstraints={videoConstraints}
                 className="w-full h-full object-cover"
-                onUserMedia={() => setIsLoading(false)}
+                onUserMedia={handleCameraReady}
+                onUserMediaError={handleCameraError}
                 mirrored={false}
                 screenshotQuality={1}
                 imageSmoothing={true}
