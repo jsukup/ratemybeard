@@ -34,7 +34,6 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
   const [isLoading, setIsLoading] = React.useState(false);
   const [hasPermission, setHasPermission] = React.useState<boolean | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const [selectedDeviceId, setSelectedDeviceId] = React.useState<string>("");
   const [showGuide, setShowGuide] = React.useState(true);
   const [showFlash, setShowFlash] = React.useState(false);
   const [showUsernameInput, setShowUsernameInput] = React.useState(false);
@@ -43,22 +42,17 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
   const webcamRef = React.useRef<Webcam | null>(null);
 
 
-  // Get available video devices and auto-select the first one
+  // Request camera permission (no longer auto-selecting specific devices)
   async function getVideoDevices() {
     try {
-      // First request permission to access media devices
-      await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      
-      // Then enumerate devices to get the first available camera
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoInputs = devices.filter(device => device.kind === 'videoinput');
-      
-      // Automatically select the first camera if available and none is selected
-      if (videoInputs.length > 0 && !selectedDeviceId) {
-        setSelectedDeviceId(videoInputs[0].deviceId);
-      }
+      // Request permission to access media devices
+      // Let facingMode constraint handle camera selection
+      await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: "environment" }, 
+        audio: false 
+      });
     } catch (err) {
-      console.error("Error getting video devices:", err);
+      console.error("Error accessing camera:", err);
       setError("Could not access camera devices. Please check permissions.");
       setHasPermission(false);
     }
@@ -181,8 +175,7 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
     width: { ideal: 1280 },
     height: { ideal: 720 },
     aspectRatio: 16/9,
-    deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined,
-    facingMode: "environment"
+    facingMode: { exact: "environment" }
   };
 
   return (
