@@ -42,18 +42,38 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
   const webcamRef = React.useRef<Webcam | null>(null);
 
 
-  // Request camera permission (no longer auto-selecting specific devices)
+  // Request camera permission with progressive fallback strategy
   async function getVideoDevices() {
     try {
-      // Request permission to access media devices
-      // Let facingMode constraint handle camera selection
-      await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "environment" }, 
-        audio: false 
-      });
+      // Try rear camera first, but allow fallback to any camera
+      try {
+        await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: { ideal: "environment" } }, 
+          audio: false 
+        });
+        console.log("Camera access successful - rear camera preferred");
+      } catch (rearCameraError) {
+        console.warn("Rear camera not available, trying any camera:", rearCameraError);
+        // Fallback to any available camera
+        await navigator.mediaDevices.getUserMedia({ 
+          video: true, 
+          audio: false 
+        });
+        console.log("Camera access successful - using available camera");
+      }
     } catch (err) {
-      console.error("Error accessing camera:", err);
-      setError("Could not access camera devices. Please check permissions.");
+      console.error("Error accessing any camera:", err);
+      const errorMessage = err instanceof Error ? err.message : "Unknown camera error";
+      
+      if (errorMessage.includes("Permission denied") || errorMessage.includes("NotAllowedError")) {
+        setError("Camera access denied. Please allow camera permissions and try again.");
+      } else if (errorMessage.includes("NotFoundError") || errorMessage.includes("No camera found")) {
+        setError("No camera found on this device.");
+      } else if (errorMessage.includes("NotReadableError")) {
+        setError("Camera is being used by another application. Please close other apps and try again.");
+      } else {
+        setError("Could not access camera. Please check permissions and try again.");
+      }
       setHasPermission(false);
     }
   }
@@ -175,7 +195,7 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
     width: { ideal: 1280 },
     height: { ideal: 720 },
     aspectRatio: 16/9,
-    facingMode: { exact: "environment" }
+    facingMode: { ideal: "environment" }
   };
 
   return (
