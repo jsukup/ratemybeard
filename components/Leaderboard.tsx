@@ -294,30 +294,30 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
   return (
     <div className="space-y-4">
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 md:grid-cols-3 gap-2 md:gap-4">
         <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-primary">{totalImages}</div>
-            <div className="text-sm text-muted-foreground">Ranked Images</div>
+          <CardContent className="p-2 md:p-4 text-center">
+            <div className="text-lg md:text-2xl font-bold text-primary">{totalImages}</div>
+            <div className="text-xs md:text-sm text-muted-foreground">Ranked Images</div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-primary">{totalRatings.toLocaleString()}</div>
-            <div className="text-sm text-muted-foreground">Total Ratings</div>
+          <CardContent className="p-2 md:p-4 text-center">
+            <div className="text-lg md:text-2xl font-bold text-primary">{totalRatings.toLocaleString()}</div>
+            <div className="text-xs md:text-sm text-muted-foreground">Total Ratings</div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-primary">{averageRating.toFixed(2)}</div>
-            <div className="text-sm text-muted-foreground">Average Rating</div>
+          <CardContent className="p-2 md:p-4 text-center">
+            <div className="text-lg md:text-2xl font-bold text-primary">{averageRating.toFixed(2)}</div>
+            <div className="text-xs md:text-sm text-muted-foreground">Average Rating</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Category Navigation */}
       <Tabs value={activeCategory} onValueChange={(value) => setActiveCategory(value as CategoryName)}>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-3 mb-4 md:mb-6">
           {CATEGORY_CONFIGS.map((config) => {
             const isActive = activeCategory === config.name;
             const categoryImages = categorizedImages[config.name] || [];
@@ -327,9 +327,9 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                 key={config.name}
                 onClick={() => setActiveCategory(config.name)}
                 className={`
-                  relative group overflow-hidden rounded-xl p-4 sm:p-5 transition-all duration-300 ease-out
+                  relative group overflow-hidden rounded-lg md:rounded-xl p-2 md:p-4 lg:p-5 transition-all duration-300 ease-out
                   transform hover:scale-105 hover:shadow-xl active:scale-95
-                  border-2 text-white font-semibold text-sm sm:text-base
+                  border-2 text-white font-semibold text-xs md:text-sm lg:text-base
                   ${
                     isActive 
                       ? `${config.color} border-white shadow-lg scale-105` 
@@ -341,7 +341,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                 <div className="absolute inset-0 bg-black bg-opacity-20"></div>
                 
                 {/* Content */}
-                <div className="relative z-10 flex flex-col items-center space-y-2">
+                <div className="relative z-10 flex flex-col items-center space-y-1 md:space-y-2">
                   {config.icon && (
                     <div className="flex items-center justify-center">
                       {config.icon}
@@ -349,7 +349,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                   )}
                   <div className="text-center">
                     <div className="font-bold leading-tight">{config.label}</div>
-                    <div className="text-xs opacity-90 mt-1">
+                    <div className="text-xs opacity-90 mt-0.5 md:mt-1 hidden sm:block">
                       {categoryImages.length} {categoryImages.length === 1 ? 'image' : 'images'}
                     </div>
                   </div>
@@ -357,7 +357,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                 
                 {/* Active indicator */}
                 {isActive && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-white rounded-full"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 md:h-1 bg-white rounded-full"></div>
                 )}
                 
                 {/* Hover effect */}
@@ -367,8 +367,8 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
           })}
         </div>
         
-        {/* Category Description */}
-        <div className="mb-4 p-4 bg-card rounded-lg border-l-4 border-primary">
+        {/* Category Description - Hidden on mobile for space optimization */}
+        <div className="hidden md:block mb-4 p-4 bg-card rounded-lg border-l-4 border-primary">
           <p className="text-lg text-center italic">
             {CATEGORY_CONFIGS.find(c => c.name === activeCategory)?.description}
           </p>
