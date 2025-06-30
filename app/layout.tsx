@@ -40,6 +40,7 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta name="theme-color" content="#000000" />
+        <meta name="google-adsense-account" content="ca-pub-8459009337119987" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
