@@ -26,6 +26,8 @@ export function ImageModal({ isOpen, onClose, image, rank }: ImageModalProps) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [lastTouch, setLastTouch] = useState<{ x: number; y: number } | null>(null);
+  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number; aspectRatio: number } | null>(null);
+  const [optimalScale, setOptimalScale] = useState(1);
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -55,8 +57,77 @@ export function ImageModal({ isOpen, onClose, image, rank }: ImageModalProps) {
       setHasError(false);
       setScale(1);
       setPosition({ x: 0, y: 0 });
+      setImageDimensions(null);
+      setOptimalScale(1);
     }
   }, [image.id, isOpen]);
+
+  // Calculate optimal scale and container size based on image dimensions
+  const calculateOptimalDisplay = (imgWidth: number, imgHeight: number) => {
+    if (!containerRef.current) return { scale: 1, containerHeight: '60vh' };
+    
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const aspectRatio = imgWidth / imgHeight;
+    const isPortrait = aspectRatio < 1;
+    const isLandscape = aspectRatio > 1.5;
+    
+    // Responsive container sizing based on viewport and image orientation
+    let maxContainerWidth: number;
+    let maxContainerHeight: number;
+    
+    if (viewportWidth >= 1280) { // xl breakpoint
+      maxContainerWidth = isPortrait ? 600 : 900;
+      maxContainerHeight = isPortrait ? viewportHeight * 0.85 : viewportHeight * 0.7;
+    } else if (viewportWidth >= 1024) { // lg breakpoint  
+      maxContainerWidth = isPortrait ? 500 : 700;
+      maxContainerHeight = isPortrait ? viewportHeight * 0.8 : viewportHeight * 0.65;
+    } else if (viewportWidth >= 768) { // md breakpoint
+      maxContainerWidth = isPortrait ? 400 : 600;
+      maxContainerHeight = isPortrait ? viewportHeight * 0.75 : viewportHeight * 0.6;
+    } else { // mobile
+      maxContainerWidth = viewportWidth * 0.9;
+      maxContainerHeight = viewportHeight * 0.6;
+    }
+    
+    // Calculate optimal scale to fit image nicely in container
+    const widthScale = maxContainerWidth / imgWidth;
+    const heightScale = maxContainerHeight / imgHeight;
+    const optimalScale = Math.min(widthScale, heightScale, 1); // Don't scale up beyond original size
+    
+    // Ensure minimum readable size for very small images
+    const finalScale = Math.max(optimalScale, 0.5);
+    
+    // Calculate container height based on scaled image dimensions
+    const scaledHeight = imgHeight * finalScale;
+    const containerHeight = Math.min(scaledHeight + 40, maxContainerHeight); // +40 for padding
+    
+    return {
+      scale: finalScale,
+      containerHeight: `${containerHeight}px`,
+      maxWidth: maxContainerWidth
+    };
+  };
+
+  // Handle image load and calculate optimal display
+  const handleImageLoad = () => {
+    setIsLoading(false);
+    
+    if (imageRef.current) {
+      const { naturalWidth, naturalHeight } = imageRef.current;
+      const aspectRatio = naturalWidth / naturalHeight;
+      
+      setImageDimensions({
+        width: naturalWidth,
+        height: naturalHeight,
+        aspectRatio
+      });
+      
+      const optimal = calculateOptimalDisplay(naturalWidth, naturalHeight);
+      setOptimalScale(optimal.scale);
+      setScale(optimal.scale);
+    }
+  };
 
   // Handle wheel zoom
   const handleWheel = (e: React.WheelEvent) => {
@@ -121,9 +192,9 @@ export function ImageModal({ isOpen, onClose, image, rank }: ImageModalProps) {
     setLastTouch(null);
   };
 
-  // Reset image position and scale
+  // Reset image to optimal position and scale
   const resetImage = () => {
-    setScale(1);
+    setScale(optimalScale);
     setPosition({ x: 0, y: 0 });
   };
 
@@ -151,7 +222,7 @@ export function ImageModal({ isOpen, onClose, image, rank }: ImageModalProps) {
       onClick={onClose}
     >
       <div 
-        className="relative bg-white rounded-lg max-w-4xl max-h-[90vh] w-full overflow-hidden shadow-2xl"
+        className="relative bg-white rounded-lg max-w-3xl lg:max-w-4xl xl:max-w-5xl max-h-[90vh] w-full overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -166,7 +237,7 @@ export function ImageModal({ isOpen, onClose, image, rank }: ImageModalProps) {
                 New Upload
               </Badge>
             )}
-            <h2 className="text-xl font-semibold">{image.username}'s Image</h2>
+            <h2 className="text-xl font-semibold">{image.username}&apos;s Image</h2>
           </div>
           <Button 
             variant="ghost" 
@@ -181,7 +252,14 @@ export function ImageModal({ isOpen, onClose, image, rank }: ImageModalProps) {
         {/* Image Container */}
         <div 
           ref={containerRef}
-          className="relative bg-gray-50 overflow-hidden min-h-[300px] max-h-[60vh] cursor-grab active:cursor-grabbing"
+          className="relative bg-gray-50 overflow-hidden cursor-grab active:cursor-grabbing"
+          style={{
+            minHeight: '300px',
+            height: imageDimensions ? 
+              calculateOptimalDisplay(imageDimensions.width, imageDimensions.height).containerHeight : 
+              '60vh',
+            maxHeight: '85vh'
+          }}
           onWheel={handleWheel}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
@@ -225,7 +303,7 @@ export function ImageModal({ isOpen, onClose, image, rank }: ImageModalProps) {
                 src={image.image_url}
                 alt={`${image.username}'s submission`}
                 className="max-w-full max-h-full object-contain rounded select-none"
-                onLoad={() => setIsLoading(false)}
+                onLoad={handleImageLoad}
                 onError={() => {
                   setIsLoading(false);
                   setHasError(true);
@@ -260,9 +338,9 @@ export function ImageModal({ isOpen, onClose, image, rank }: ImageModalProps) {
                 size="sm"
                 className="h-8 w-8 p-0 text-xs"
                 onClick={resetImage}
-                title="Reset zoom and position"
+                title="Fit to screen"
               >
-                1:1
+                FIT
               </Button>
             </div>
           )}
