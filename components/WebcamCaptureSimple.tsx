@@ -4,13 +4,6 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Camera } from "lucide-react";
 import Webcam from "react-webcam";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { supabase } from '@/lib/supabase';
 import UsernameInput from './UsernameInput';
 
@@ -35,17 +28,12 @@ interface WebcamCaptureProps {
   onAddToLeaderboard?: () => void;
 }
 
-interface VideoDevice {
-  deviceId: string;
-  label: string;
-}
 
 export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, onAddToLeaderboard }: WebcamCaptureProps) {
   const [imgSrc, setImgSrc] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [hasPermission, setHasPermission] = React.useState<boolean | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const [videoDevices, setVideoDevices] = React.useState<VideoDevice[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = React.useState<string>("");
   const [showGuide, setShowGuide] = React.useState(true);
   const [showFlash, setShowFlash] = React.useState(false);
@@ -55,26 +43,19 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
   const webcamRef = React.useRef<Webcam | null>(null);
 
 
-  // Get available video devices
+  // Get available video devices and auto-select the first one
   async function getVideoDevices() {
     try {
       // First request permission to access media devices
       await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       
-      // Then enumerate devices
+      // Then enumerate devices to get the first available camera
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoInputs = devices.filter(device => device.kind === 'videoinput');
       
-      const formattedDevices = videoInputs.map(device => ({
-        deviceId: device.deviceId,
-        label: device.label || `Camera ${videoInputs.indexOf(device) + 1}`
-      }));
-      
-      setVideoDevices(formattedDevices);
-      
-      // Select the first device by default if we have devices and none is selected
-      if (formattedDevices.length > 0 && !selectedDeviceId) {
-        setSelectedDeviceId(formattedDevices[0].deviceId);
+      // Automatically select the first camera if available and none is selected
+      if (videoInputs.length > 0 && !selectedDeviceId) {
+        setSelectedDeviceId(videoInputs[0].deviceId);
       }
     } catch (err) {
       console.error("Error getting video devices:", err);
@@ -99,10 +80,8 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
       // Stop any existing stream
       stopWebcam();
       
-      // Get video devices if we don't have them yet
-      if (videoDevices.length === 0) {
-        await getVideoDevices();
-      }
+      // Get video devices and auto-select default camera
+      await getVideoDevices();
       
       setHasPermission(true);
     } catch (err) {
@@ -114,14 +93,6 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
     }
   }
 
-  // Handle device change
-  function handleDeviceChange(deviceId: string) {
-    setSelectedDeviceId(deviceId);
-    // Reinitialize webcam with new device
-    if (deviceId) {
-      initializeWebcam();
-    }
-  }
 
 
   // Capture photo with higher quality settings
@@ -261,7 +232,7 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
                 videoConstraints={videoConstraints}
                 className="w-full h-full object-cover"
                 onUserMedia={() => setIsLoading(false)}
-                mirrored={true}
+                mirrored={false}
                 screenshotQuality={1}
                 imageSmoothing={true}
               />
@@ -270,27 +241,6 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
         )}
       </div>
       
-      {!imgSrc && videoDevices.length > 1 && (
-        <div className="w-full max-w-xl">
-          {/* Camera selection dropdown */}
-          <Select
-            value={selectedDeviceId}
-            onValueChange={handleDeviceChange}
-            disabled={isLoading}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select camera" />
-            </SelectTrigger>
-            <SelectContent>
-              {videoDevices.map((device) => (
-                <SelectItem key={device.deviceId} value={device.deviceId}>
-                  {device.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
       
       {/* Action buttons */}
       <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xl mt-2">
