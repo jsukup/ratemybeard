@@ -341,7 +341,7 @@ function HomeContent() {
               <AdContainer 
                 className="h-full"
                 adSlot="left-sidebar-vertical"
-                adFormat="vertical"
+                adFormat="rectangle"
               />
             </aside>
 
@@ -358,7 +358,7 @@ function HomeContent() {
                   <AdContainer 
                     className="w-full h-24"
                     adSlot="mobile-mid-horizontal"
-                    adFormat="horizontal"
+                    adFormat="leaderboard"
                     responsive={true}
                   />
                 </div>
@@ -386,7 +386,7 @@ function HomeContent() {
                   <AdContainer 
                     className="w-full h-28"
                     adSlot="upload-bottom-horizontal"
-                    adFormat="horizontal"
+                    adFormat="leaderboard"
                     responsive={true}
                   />
                 </TabsContent>
@@ -402,7 +402,7 @@ function HomeContent() {
               <AdContainer 
                 className="h-full"
                 adSlot="right-sidebar-vertical"
-                adFormat="vertical"
+                adFormat="rectangle"
               />
             </aside>
           </div>

@@ -4,7 +4,7 @@ import * as React from 'react';
 
 declare global {
   interface Window {
-    adsbygoogle: any[];
+    atOptions: any;
   }
 }
 
@@ -46,18 +46,24 @@ export default function AdScript() {
 interface AdContainerProps {
   className?: string;
   adSlot: string;
-  adFormat?: 'auto' | 'fluid' | 'rectangle' | 'vertical' | 'horizontal';
+  adFormat?: 'auto' | 'fluid' | 'rectangle' | 'leaderboard';
   style?: React.CSSProperties;
   responsive?: boolean;
   lazyLoad?: boolean;
 }
 
-// Standard ad sizes for reference (in pixels)
-const AD_SIZES = {
-  rectangle: { width: 336, height: 280 }, // Medium Rectangle
-  vertical: { width: 160, height: 600 },  // Wide Skyscraper
-  horizontal: { width: 728, height: 90 }, // Leaderboard
-  // Add more standard sizes as needed
+// Adsterra ad configurations
+const ADSTERRA_CONFIGS = {
+  rectangle: {
+    key: 'db61a04e8daccfe0a0b946188db6e304',
+    width: 300,
+    height: 250
+  },
+  leaderboard: {
+    key: '2d5f0ac494d06daf778e0c3b1d8de02e',
+    width: 728,
+    height: 90
+  }
 };
 
 export function AdContainer({ 
@@ -104,18 +110,36 @@ export function AdContainer({
     };
   }, [lazyLoad, adInitialized, hidden]);
 
-  // Initialize AdSense when ad becomes visible
+  // Initialize Adsterra when ad becomes visible
   React.useEffect(() => {
     if (TEST_ADS || !isVisible || hidden) return;
 
+    const config = ADSTERRA_CONFIGS[adFormat as keyof typeof ADSTERRA_CONFIGS];
+    if (!config) return;
+
     try {
-      if (window.adsbygoogle) {
-        window.adsbygoogle.push({});
+      // Set global atOptions for this ad
+      window.atOptions = {
+        key: config.key,
+        format: 'iframe',
+        height: config.height,
+        width: config.width,
+        params: {}
+      };
+
+      // Create and append the Adsterra script
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = `//www.highperformanceformat.com/${config.key}/invoke.js`;
+      script.async = true;
+      
+      if (adRef.current) {
+        adRef.current.appendChild(script);
       }
     } catch (error) {
-      console.error("AdSense error:", error);
+      console.error("Adsterra error:", error);
     }
-  }, [isVisible, hidden]);
+  }, [isVisible, hidden, adFormat]);
   
   // If this ad is hidden during development, don't render it
   if (hidden) {
@@ -126,8 +150,7 @@ export function AdContainer({
     // Get background color based on ad type for better visual distinction
     const getBgColor = () => {
       switch (adFormat) {
-        case 'vertical': return 'bg-blue-50';
-        case 'horizontal': return 'bg-green-50';
+        case 'leaderboard': return 'bg-green-50';
         case 'rectangle': return 'bg-purple-50';
         default: return 'bg-gray-50';
       }
@@ -136,8 +159,7 @@ export function AdContainer({
     // Get border color based on ad type
     const getBorderColor = () => {
       switch (adFormat) {
-        case 'vertical': return 'border-blue-200';
-        case 'horizontal': return 'border-green-200';
+        case 'leaderboard': return 'border-green-200';
         case 'rectangle': return 'border-purple-200';
         default: return 'border-gray-200';
       }
@@ -147,10 +169,12 @@ export function AdContainer({
     const getDefaultSize = () => {
       if (responsive) return {};
       
-      const defaultSize = AD_SIZES[adFormat as keyof typeof AD_SIZES] || { width: 'auto', height: 'auto' };
+      const config = ADSTERRA_CONFIGS[adFormat as keyof typeof ADSTERRA_CONFIGS];
+      if (!config) return { width: 'auto', height: 'auto' };
+      
       return {
-        width: `${defaultSize.width}px`,
-        height: `${defaultSize.height}px`,
+        width: `${config.width}px`,
+        height: `${config.height}px`,
       };
     };
     
@@ -188,20 +212,16 @@ export function AdContainer({
   }
   
   return (
-    <div ref={adRef} className={className} style={style}>
-      {isVisible && (
-        <ins
-          className="adsbygoogle"
-          style={{
-            display: 'block',
-            ...(responsive && { width: '100%' })
-          }}
-          data-ad-client="ca-pub-8459009337119987" // Your actual publisher ID
-          data-ad-slot={adSlot}
-          data-ad-format={adFormat}
-          data-full-width-responsive={responsive ? 'true' : 'false'}
-        />
-      )}
+    <div 
+      ref={adRef} 
+      className={className} 
+      style={{
+        ...style,
+        ...(responsive && { width: '100%' }),
+        display: isVisible ? 'block' : 'none'
+      }}
+    >
+      {/* Adsterra ad will be injected here by the script */}
     </div>
   );
 } 

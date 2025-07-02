@@ -670,7 +670,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
       <AdContainer 
         className="w-full h-24"
         adSlot="leaderboard-bottom-horizontal"
-        adFormat="horizontal"
+        adFormat="leaderboard"
         responsive={true}
       />
 
