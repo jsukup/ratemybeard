@@ -31,15 +31,15 @@ interface AdContainerProps {
   lazyLoad?: boolean;
 }
 
-// Adsterra ad configurations
-const ADSTERRA_CONFIGS = {
+// Adcash ad configurations
+const ADCASH_CONFIGS = {
   rectangle: {
-    key: 'db61a04e8daccfe0a0b946188db6e304',
+    zoneId: '6pjyf52tw',
     width: 300,
     height: 250
   },
   leaderboard: {
-    key: '2d5f0ac494d06daf778e0c3b1d8de02e',
+    zoneId: '6pjyf52tw',
     width: 728,
     height: 90
   }
@@ -86,34 +86,37 @@ export function AdContainer({
     };
   }, [lazyLoad, adInitialized]);
 
-  // Initialize Adsterra when ad becomes visible
+  // Initialize Adcash when ad becomes visible
   React.useEffect(() => {
     if (!isVisible) return;
 
-    const config = ADSTERRA_CONFIGS[adFormat as keyof typeof ADSTERRA_CONFIGS];
+    const config = ADCASH_CONFIGS[adFormat as keyof typeof ADCASH_CONFIGS];
     if (!config) return;
 
     try {
-      // Set global atOptions for this ad
-      (window as any).atOptions = {
-        key: config.key,
-        format: 'iframe',
-        height: config.height,
-        width: config.width,
-        params: {}
-      };
-
-      // Create and append the Adsterra script
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = `//www.highperformanceformat.com/${config.key}/invoke.js`;
-      script.async = true;
-      
-      if (adRef.current) {
-        adRef.current.appendChild(script);
+      // Load Adcash library if not already loaded
+      if (typeof (window as any).aclib === 'undefined') {
+        const aclibScript = document.createElement('script');
+        aclibScript.type = 'text/javascript';
+        aclibScript.src = '//acscdn.com/script/aclib.js';
+        aclibScript.async = true;
+        aclibScript.onload = () => {
+          // Initialize Adcash AutoTag after library loads
+          if ((window as any).aclib && (window as any).aclib.runAutoTag) {
+            (window as any).aclib.runAutoTag({
+              zoneId: config.zoneId
+            });
+          }
+        };
+        document.head.appendChild(aclibScript);
+      } else {
+        // Library already loaded, run AutoTag directly
+        (window as any).aclib.runAutoTag({
+          zoneId: config.zoneId
+        });
       }
     } catch (error) {
-      console.error("Adsterra error:", error);
+      console.error("Adcash error:", error);
       console.error("Config:", config);
       console.error("Ad format:", adFormat);
     }
@@ -129,7 +132,7 @@ export function AdContainer({
         display: isVisible ? 'block' : 'none'
       }}
     >
-      {/* Adsterra ad will be injected here by the script */}
+      {/* Adcash ad will be injected here by the script */}
     </div>
   );
 } 

@@ -1,3 +1,3 @@
-# Adsterra ads.txt
-# Note: Adsterra typically doesn't require ads.txt entries
-# Contact Adsterra support for specific ads.txt requirements if needed
+# Adcash ads.txt
+# Note: Adcash typically doesn't require ads.txt entries
+# Contact Adcash support for specific ads.txt requirements if needed

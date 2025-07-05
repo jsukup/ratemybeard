@@ -53,7 +53,7 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
         
-        {/* Adsterra ads are loaded dynamically by the AdContainer components */}
+        {/* Adcash ads are loaded dynamically by the AdContainer components */}
         
         {/* Google Analytics */}
         <Script
