@@ -1,1 +1,3 @@
-google.com, pub-8459009337119987, DIRECT, f08c47fec0942fa0
+# Adsterra ads.txt
+# Note: Adsterra typically doesn't require ads.txt entries
+# Contact Adsterra support for specific ads.txt requirements if needed

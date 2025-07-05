@@ -9,7 +9,7 @@ declare global {
 }
 
 // Set this to true to display placeholder boxes instead of real ads for testing
-const TEST_ADS = true;
+const TEST_ADS = false;
 
 // Create a context to manage ad visibility for testing
 interface AdContextType {

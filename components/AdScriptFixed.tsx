@@ -114,6 +114,8 @@ export function AdContainer({
       }
     } catch (error) {
       console.error("Adsterra error:", error);
+      console.error("Config:", config);
+      console.error("Ad format:", adFormat);
     }
   }, [isVisible, adFormat]);
 

@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, Star, Trophy, Users, TrendingUp, Sparkles, Flag } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AdContainer } from "@/components/AdScript";
+import { AdContainer } from "@/components/AdScriptFixed";
 import { getLeaderboardData } from "@/utils/medianCalculation";
 import { getRatingColor, getRatingBgColor } from "@/lib/utils";
 import { InlineRatingSlider } from "@/components/InlineRatingSlider";
