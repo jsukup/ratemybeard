@@ -34,12 +34,12 @@ interface AdContainerProps {
 // Adcash ad configurations
 const ADCASH_CONFIGS = {
   rectangle: {
-    zoneId: '6pjyf52tw',
+    zoneId: '10145178',
     width: 300,
     height: 250
   },
   leaderboard: {
-    zoneId: '6pjyf52tw',
+    zoneId: '10145146',
     width: 728,
     height: 90
   }
@@ -101,17 +101,17 @@ export function AdContainer({
         aclibScript.src = '//acscdn.com/script/aclib.js';
         aclibScript.async = true;
         aclibScript.onload = () => {
-          // Initialize Adcash AutoTag after library loads
-          if ((window as any).aclib && (window as any).aclib.runAutoTag) {
-            (window as any).aclib.runAutoTag({
+          // Initialize Adcash Banner after library loads
+          if ((window as any).aclib && (window as any).aclib.runBanner) {
+            (window as any).aclib.runBanner({
               zoneId: config.zoneId
             });
           }
         };
         document.head.appendChild(aclibScript);
       } else {
-        // Library already loaded, run AutoTag directly
-        (window as any).aclib.runAutoTag({
+        // Library already loaded, run Banner directly
+        (window as any).aclib.runBanner({
           zoneId: config.zoneId
         });
       }
