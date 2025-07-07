@@ -280,7 +280,7 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
       {!imgSrc && !showUsernameInput && (
         <div className="flex flex-col items-center w-full max-w-xl mt-2">
           <a 
-            href="mailto:hello@ratemyfeet.com" 
+            href="mailto:info@ratemyfeet.net" 
             className="mt-2 text-primary hover:text-primary/80 font-medium transition-colors"
           >
             Questions? Suggestions? Contact Us!

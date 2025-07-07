@@ -13,8 +13,8 @@ export const BRAND_CONFIG = {
   longDescription: 'A fun, community-driven platform where users can submit photos and rate foot attractiveness through user-generated scoring',
   
   // Contact Information
-  contactEmail: 'hello@ratemyfeet.com',
-  supportEmail: 'support@ratemyfeet.com',
+  contactEmail: 'info@ratemyfeet.net',
+  supportEmail: 'info@ratemyfeet.net',
   
   // Asset Paths - Updated with actual assets
   assets: {
