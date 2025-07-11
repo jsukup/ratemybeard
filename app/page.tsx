@@ -49,7 +49,7 @@ function HomeContent() {
   const [screenName, setScreenName] = useState("");
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState("upload");
+  const [activeTab, setActiveTab] = useState("leaderboard");
   const [submittedEntryId, setSubmittedEntryId] = useState<number | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
