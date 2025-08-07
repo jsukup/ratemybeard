@@ -6,6 +6,7 @@ import { Slider } from '@/components/ui/slider';
 import { AlertCircle, Star, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { getOrCreateSessionId } from '@/lib/session';
+import { RatingButtonsGrid } from '@/components/RatingButtonsGrid';
 
 interface InlineRatingSliderProps {
   imageId: string;
@@ -20,6 +21,10 @@ export function InlineRatingSlider({
   onRatingSubmit,
   className = "" 
 }: InlineRatingSliderProps) {
+  // Feature flag for discrete ratings
+  const useDiscreteRatings = process.env.NEXT_PUBLIC_ENABLE_DISCRETE_RATINGS === 'true';
+  
+  // Legacy slider state
   const [rating, setRating] = useState<number[]>([5.0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -87,6 +92,27 @@ export function InlineRatingSlider({
     }
   };
 
+  // Handle rating submission for discrete buttons
+  const handleDiscreteRatingSubmit = (rating: number, updatedStats?: { median_score: number; rating_count: number }) => {
+    // Call the callback immediately since RatingButtonsGrid handles the API call
+    onRatingSubmit?.(rating, updatedStats);
+  };
+
+  // Use new discrete rating system if feature flag is enabled
+  if (useDiscreteRatings) {
+    return (
+      <div className={className}>
+        <RatingButtonsGrid
+          imageId={imageId}
+          onSubmit={handleDiscreteRatingSubmit}
+          disabled={disabled}
+          compact={true}
+        />
+      </div>
+    );
+  }
+
+  // Legacy inline slider implementation
   if (success) {
     return (
       <div className={`flex items-center justify-center text-sm text-green-600 ${className}`}>

@@ -38,17 +38,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validation: Check rating range (0.00 to 10.00)
+    // Check if using discrete ratings (feature flag)
+    const useDiscreteRatings = process.env.NEXT_PUBLIC_ENABLE_DISCRETE_RATINGS === 'true';
+    
+    // Validation: Check rating range based on mode
     const numericRating = parseFloat(rating.toString());
-    if (isNaN(numericRating) || numericRating < 0 || numericRating > 10) {
+    
+    if (isNaN(numericRating)) {
       return NextResponse.json(
-        { error: 'Rating must be between 0.00 and 10.00' },
+        { error: 'Rating must be a valid number' },
         { status: 400 }
       );
     }
-
-    // Round rating to 2 decimal places
-    const finalRating = Math.round(numericRating * 100) / 100;
+    
+    let finalRating: number;
+    
+    if (useDiscreteRatings) {
+      // Discrete mode: Accept integers 1-10 only
+      if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 10) {
+        return NextResponse.json(
+          { error: 'Rating must be an integer between 1 and 10' },
+          { status: 400 }
+        );
+      }
+      // Store discrete ratings as X.00 format (1.00, 2.00, etc.)
+      finalRating = numericRating;
+    } else {
+      // Legacy mode: Accept decimals 0.00-10.00
+      if (numericRating < 0 || numericRating > 10) {
+        return NextResponse.json(
+          { error: 'Rating must be between 0.00 and 10.00' },
+          { status: 400 }
+        );
+      }
+      // Round legacy ratings to 2 decimal places
+      finalRating = Math.round(numericRating * 100) / 100;
+    }
 
     // Check if image exists
     const { data: imageExists, error: imageError } = await supabase

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Star } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { RatingButtonsGrid } from "@/components/RatingButtonsGrid";
 
 interface RatingSliderProps {
   imageId: string;
@@ -23,6 +24,10 @@ function Spinner({ className }: { className?: string }) {
 }
 
 function RatingSliderComponent({ imageId, onSubmit, disabled = false, className = "" }: RatingSliderProps) {
+  // Feature flag for discrete ratings
+  const useDiscreteRatings = process.env.NEXT_PUBLIC_ENABLE_DISCRETE_RATINGS === 'true';
+  
+  // Legacy slider state
   const [rating, setRating] = useState<number[]>([5.00]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -113,6 +118,34 @@ function RatingSliderComponent({ imageId, onSubmit, disabled = false, className 
     return "text-red-600";
   };
 
+  // Use new discrete rating system if feature flag is enabled
+  if (useDiscreteRatings) {
+    return (
+      <Card className={`w-full max-w-md mx-auto ${className}`}>
+        <CardHeader className="text-center">
+          <CardTitle className="flex items-center justify-center gap-2">
+            <Star className="h-5 w-5 text-yellow-500" />
+            Rate This Image
+            <Star className="h-5 w-5 text-yellow-500" />
+          </CardTitle>
+          <CardDescription>
+            Click a number to rate from 1 to 10
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent>
+          <RatingButtonsGrid
+            imageId={imageId}
+            onSubmit={onSubmit}
+            disabled={disabled}
+            compact={false}
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Legacy slider implementation
   return (
     <Card className={`w-full max-w-md mx-auto ${className}`}>
       <CardHeader className="text-center">
