@@ -1,0 +1,82 @@
+-- Improved RLS Policies Migration (TEMPLATE - DO NOT APPLY YET)
+-- This migration replaces permissive policies with proper access controls
+-- Date: 2025-08-08
+-- 
+-- IMPORTANT: Only apply this after testing the basic RLS enablement
+-- and ensuring your application works correctly with RLS enabled
+
+-- Drop the permissive policies
+DROP POLICY IF EXISTS "Allow all access to images" ON images;
+DROP POLICY IF EXISTS "Allow all access to ratings" ON ratings; 
+DROP POLICY IF EXISTS "Allow all access to reports" ON reports;
+
+-- Images table policies
+-- Allow anyone to view approved images
+CREATE POLICY "Public read access to approved images" ON images 
+FOR SELECT USING (moderation_status = 'approved');
+
+-- Allow anyone to insert new images (for uploads)
+CREATE POLICY "Public insert access to images" ON images 
+FOR INSERT WITH CHECK (true);
+
+-- Allow updates only to own images (you'll need to add user identification)
+-- This is a placeholder - you'll need to implement user authentication first
+-- CREATE POLICY "Users can update own images" ON images 
+-- FOR UPDATE USING (auth.uid() = user_id);
+
+-- Ratings table policies
+-- Allow anyone to view ratings for statistical purposes
+CREATE POLICY "Public read access to ratings" ON ratings 
+FOR SELECT USING (true);
+
+-- Allow anyone to insert ratings (with session-based duplicate prevention)
+CREATE POLICY "Public insert access to ratings" ON ratings 
+FOR INSERT WITH CHECK (true);
+
+-- Prevent updates and deletes of ratings (data integrity)
+CREATE POLICY "No updates to ratings" ON ratings 
+FOR UPDATE USING (false);
+
+CREATE POLICY "No deletes of ratings" ON ratings 
+FOR DELETE USING (false);
+
+-- Reports table policies
+-- Allow anyone to insert reports
+CREATE POLICY "Public insert access to reports" ON reports 
+FOR INSERT WITH CHECK (true);
+
+-- Restrict read access to reports (admin only)
+-- This is a placeholder - you'll need to implement admin authentication
+-- CREATE POLICY "Admin read access to reports" ON reports 
+-- FOR SELECT USING (auth.jwt() ->> 'role' = 'admin');
+
+-- Allow read access for now (to be restricted later)
+CREATE POLICY "Temporary read access to reports" ON reports 
+FOR SELECT USING (true);
+
+-- Prevent updates and deletes of reports (audit trail integrity)
+CREATE POLICY "No updates to reports" ON reports 
+FOR UPDATE USING (false);
+
+CREATE POLICY "No deletes to reports" ON reports 
+FOR DELETE USING (false);
+
+-- Add comments for documentation
+COMMENT ON POLICY "Public read access to approved images" ON images IS 'Allows public viewing of approved images only';
+COMMENT ON POLICY "Public insert access to images" ON images IS 'Allows image uploads from anyone';
+COMMENT ON POLICY "Public read access to ratings" ON ratings IS 'Allows reading ratings for statistics and leaderboard';
+COMMENT ON POLICY "Public insert access to ratings" ON ratings IS 'Allows rating submissions with session-based duplicate prevention';
+COMMENT ON POLICY "No updates to ratings" ON ratings IS 'Prevents rating modifications for data integrity';
+COMMENT ON POLICY "No deletes of ratings" ON ratings IS 'Prevents rating deletions for data integrity';
+COMMENT ON POLICY "Public insert access to reports" ON reports IS 'Allows users to report inappropriate content';
+COMMENT ON POLICY "Temporary read access to reports" ON reports IS 'Temporary policy - restrict to admin access later';
+COMMENT ON POLICY "No updates to reports" ON reports IS 'Prevents report modifications for audit trail integrity';
+COMMENT ON POLICY "No deletes to reports" ON reports IS 'Prevents report deletions for audit trail integrity';
+
+-- Log the policy improvements
+DO $$
+BEGIN
+    RAISE NOTICE 'Improved RLS policies applied';
+    RAISE NOTICE 'TODO: Implement user authentication for user-specific policies';
+    RAISE NOTICE 'TODO: Implement admin authentication for admin-only access';
+END $$;
