@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Star, Loader2 } from "lucide-react";
 import { getOrCreateSessionId } from '@/lib/session';
+import confetti from 'canvas-confetti';
 
 interface RatingButtonsGridProps {
   imageId: string;
@@ -26,13 +27,21 @@ export function RatingButtonsGrid({
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Color mapping for ratings 1-10
+  // Color mapping for ratings 1-10 (red to gold gradient)
   const getRatingColor = (rating: number): string => {
-    if (rating <= 2) return "bg-red-500 hover:bg-red-600 text-white";
-    if (rating <= 4) return "bg-orange-500 hover:bg-orange-600 text-white";
-    if (rating <= 6) return "bg-yellow-500 hover:bg-yellow-600 text-white";
-    if (rating <= 8) return "bg-green-500 hover:bg-green-600 text-white";
-    return "bg-amber-400 hover:bg-amber-500 text-white";
+    const colors = [
+      "bg-gradient-to-br from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white shadow-lg shadow-red-500/30",
+      "bg-gradient-to-br from-red-500 to-red-400 hover:from-red-600 hover:to-red-500 text-white shadow-lg shadow-red-400/30",
+      "bg-gradient-to-br from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white shadow-lg shadow-orange-500/30",
+      "bg-gradient-to-br from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white shadow-lg shadow-orange-400/30",
+      "bg-gradient-to-br from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-white shadow-lg shadow-yellow-400/30",
+      "bg-gradient-to-br from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 text-white shadow-lg shadow-amber-400/30", // Swapped from 7 to 6
+      "bg-gradient-to-br from-yellow-400 to-amber-400 hover:from-yellow-500 hover:to-amber-500 text-white shadow-lg shadow-amber-400/30", // Swapped from 6 to 7
+      "bg-gradient-to-br from-amber-400 to-yellow-300 hover:from-amber-500 hover:to-yellow-400 text-white shadow-lg shadow-amber-300/30",
+      "bg-gradient-to-br from-yellow-300 to-yellow-200 hover:from-yellow-400 hover:to-yellow-300 text-gray-800 shadow-lg shadow-yellow-300/40",
+      "bg-gradient-to-br from-yellow-300 to-yellow-100 hover:from-yellow-400 hover:to-yellow-200 text-gray-800 shadow-xl shadow-yellow-300/50"
+    ];
+    return colors[rating - 1] || colors[0];
   };
 
   const getRatingDescription = (rating: number): string => {
@@ -49,6 +58,79 @@ export function RatingButtonsGrid({
       10: "Perfect"
     };
     return descriptions[rating as keyof typeof descriptions] || "";
+  };
+
+  const triggerConfetti = (rating: number) => {
+    // Low ratings (1-3): Red particles falling down
+    if (rating <= 3) {
+      confetti({
+        particleCount: 30,
+        spread: 40,
+        origin: { y: 0.4 },
+        colors: ['#ef4444', '#dc2626', '#b91c1c'],
+        gravity: 2,
+        ticks: 50,
+        startVelocity: 10,
+        shapes: ['circle'],
+        scalar: 0.7,
+      });
+    }
+    // Mid ratings (4-7): Yellow/amber particles floating
+    else if (rating <= 7) {
+      confetti({
+        particleCount: 40,
+        spread: 60,
+        origin: { y: 0.5 },
+        colors: ['#f59e0b', '#fbbf24', '#fcd34d'],
+        gravity: 0.5,
+        ticks: 80,
+        startVelocity: 20,
+        shapes: ['square', 'circle'],
+        scalar: 0.8,
+      });
+    }
+    // High ratings (8-10): Gold confetti burst
+    else {
+      // Multiple bursts for celebration effect
+      const count = 200;
+      const defaults = {
+        origin: { y: 0.7 }
+      };
+
+      function fire(particleRatio: number, opts: any) {
+        confetti({
+          ...defaults,
+          ...opts,
+          particleCount: Math.floor(count * particleRatio),
+          colors: ['#fbbf24', '#f59e0b', '#eab308', '#facc15', '#fde047'],
+          shapes: ['star', 'circle'],
+          scalar: 1.2,
+        });
+      }
+
+      fire(0.25, {
+        spread: 26,
+        startVelocity: 55,
+      });
+      fire(0.2, {
+        spread: 60,
+      });
+      fire(0.35, {
+        spread: 100,
+        decay: 0.91,
+        scalar: 0.8,
+      });
+      fire(0.1, {
+        spread: 120,
+        startVelocity: 25,
+        decay: 0.92,
+        scalar: 1.2,
+      });
+      fire(0.1, {
+        spread: 120,
+        startVelocity: 45,
+      });
+    }
   };
 
   const handleRatingClick = async (rating: number) => {
@@ -84,6 +166,9 @@ export function RatingButtonsGrid({
       }
 
       const result = await response.json();
+      
+      // Trigger confetti effect based on rating value
+      triggerConfetti(rating);
       
       setSuccess(true);
       onSubmit(rating);
@@ -148,9 +233,11 @@ export function RatingButtonsGrid({
             className={`
               ${buttonSize} 
               ${getRatingColor(rating)}
-              ${selectedRating === rating ? 'ring-2 ring-offset-2 ring-primary' : ''}
+              ${selectedRating === rating ? 'ring-2 ring-offset-2 ring-primary scale-110' : ''}
               ${isSubmitting ? 'cursor-not-allowed opacity-50' : ''}
-              transition-all duration-200 font-bold
+              transition-all duration-200 font-bold rounded-lg
+              transform hover:scale-105 active:scale-95 active:translate-y-0.5
+              border border-white/20 backdrop-blur-sm
             `}
             variant="secondary"
           >
@@ -170,9 +257,11 @@ export function RatingButtonsGrid({
             className={`
               ${buttonSize} 
               ${getRatingColor(rating)}
-              ${selectedRating === rating ? 'ring-2 ring-offset-2 ring-primary' : ''}
+              ${selectedRating === rating ? 'ring-2 ring-offset-2 ring-primary scale-110' : ''}
               ${isSubmitting ? 'cursor-not-allowed opacity-50' : ''}
-              transition-all duration-200 font-bold
+              transition-all duration-200 font-bold rounded-lg
+              transform hover:scale-105 active:scale-95 active:translate-y-0.5
+              border border-white/20 backdrop-blur-sm
             `}
             variant="secondary"
           >

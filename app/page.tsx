@@ -330,7 +330,7 @@ function HomeContent() {
               />
             </div>
             <p className="text-lg sm:text-xl text-white drop-shadow-lg font-semibold px-4">
-              🦶 Rate the attractiveness...<em>of feet</em>! 🦶
+              🦶 COMPETE...<em>with YOUR FEET!</em>! 🦶
             </p>
           </div>
 

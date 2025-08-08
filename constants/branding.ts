@@ -8,7 +8,7 @@
 export const BRAND_CONFIG = {
   // Brand Identity
   name: 'RateMyFeet',
-  tagline: 'Rate the attractiveness of feet',
+  tagline: 'COMPETE...with YOUR FEET!',
   shortDescription: 'A lighthearted platform for rating foot attractiveness',
   longDescription: 'A fun, community-driven platform where users can submit photos and rate foot attractiveness through user-generated scoring',
   

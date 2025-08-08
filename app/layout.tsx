@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ['latin'] });
 const TEST_ADS = false;
 
 export const metadata: Metadata = {
-  title: 'RateMyFeet - Rate the Attractiveness of Feet',
+  title: 'RateMyFeet - COMPETE...with YOUR FEET!',
   description: 'Upload photos of feet and get rated by the community! Join our leaderboard and see how you rank.',
   keywords: ['feet', 'rating', 'attractiveness', 'community', 'leaderboard', 'photo', 'rating', 'feet pics'],
   authors: [{ name: 'RateMyFeet Team' }],

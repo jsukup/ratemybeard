@@ -293,8 +293,8 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
 
   return (
     <div className="space-y-4">
-      {/* Stats Overview */}
-      <div className="grid grid-cols-3 md:grid-cols-3 gap-2 md:gap-4">
+      {/* Stats Overview - Compact */}
+      <div className="grid grid-cols-3 md:grid-cols-3 gap-2 md:gap-4 mb-2">
         <Card>
           <CardContent className="p-2 md:p-4 text-center">
             <div className="text-lg md:text-2xl font-bold text-primary">{totalImages}</div>
@@ -317,7 +317,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
 
       {/* Category Navigation */}
       <Tabs value={activeCategory} onValueChange={(value) => setActiveCategory(value as CategoryName)}>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-3 mb-4 md:mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-3 mb-2 md:mb-4">
           {CATEGORY_CONFIGS.map((config) => {
             const isActive = activeCategory === config.name;
             const categoryImages = categorizedImages[config.name] || [];
@@ -368,7 +368,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
         </div>
         
         {/* Category Description - Hidden on mobile for space optimization */}
-        <div className="hidden md:block mb-4 p-4 bg-card rounded-lg border-l-4 border-primary">
+        <div className="hidden md:block mb-2 p-3 bg-card rounded-lg border-l-4 border-primary">
           <p className="text-lg text-center italic">
             {CATEGORY_CONFIGS.find(c => c.name === activeCategory)?.description}
           </p>
@@ -392,7 +392,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                   <CardDescription>Click on an image to see it full size</CardDescription>
                 </CardHeader>
                 
-                <CardContent>
+                <CardContent className="p-3 md:p-6">
                   {categoryImages.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
                       No images in this category yet
@@ -481,10 +481,11 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                           }
                                           
                                           // Also trigger full refresh to ensure consistency
+                                          // Delayed to allow confetti animation to complete
                                           setTimeout(() => {
                                             setRefreshKey(prev => prev + 1);
                                             console.log('Leaderboard refresh triggered');
-                                          }, 500);
+                                          }, 2000);
                                         }}
                                         className="w-full max-w-[180px] mx-auto"
                                       />
@@ -586,7 +587,8 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                               }
                                               
                                               modal.remove();
-                                              setTimeout(() => setRefreshKey(prev => prev + 1), 500);
+                                              // Delayed to allow confetti animation to complete
+                                              setTimeout(() => setRefreshKey(prev => prev + 1), 2000);
                                             } else {
                                               const errorData = await response.json();
                                               console.error('Rating submission failed:', errorData.error);
