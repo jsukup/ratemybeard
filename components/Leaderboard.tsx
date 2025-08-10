@@ -20,6 +20,7 @@ import { getLeaderboardData } from "@/utils/medianCalculation";
 import { getRatingColor, getRatingBgColor } from "@/lib/utils";
 import { InlineRatingSlider } from "@/components/InlineRatingSlider";
 import { getOrCreateSessionId } from "@/lib/session";
+import { hasRatedImage } from "@/utils/sessionManager";
 import { ImageModal } from "@/components/ImageModal";
 import { ReportModal } from "@/components/ReportModal";
 import { MobileRatingModal } from "@/components/MobileRatingModal";
@@ -117,6 +118,8 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [mobileRatingImage, setMobileRatingImage] = useState<LeaderboardImage | null>(null);
   const [isMobileRatingModalOpen, setIsMobileRatingModalOpen] = useState(false);
+  const [userRatedImages, setUserRatedImages] = useState<Set<string>>(new Set());
+  const [ratingStatusLoading, setRatingStatusLoading] = useState(false);
 
   // Map old category names to new ones for backward compatibility
   const mapOldCategoryToNew = (oldCategory: string): CategoryName => {
@@ -145,6 +148,36 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
   const averageRating = totalRatings > 0 && Array.isArray(images)
     ? images.reduce((sum, img) => sum + (img.median_score * img.rating_count), 0) / totalRatings 
     : 0;
+
+  // Check user rating status for visible images
+  const checkUserRatingStatus = async (imageIds: string[]) => {
+    if (!imageIds.length) return;
+    
+    setRatingStatusLoading(true);
+    const ratedImageIds = new Set<string>();
+    
+    try {
+      // Check each image in parallel
+      const checks = await Promise.allSettled(
+        imageIds.map(async (imageId) => {
+          const hasRated = await hasRatedImage(imageId);
+          return { imageId, hasRated };
+        })
+      );
+      
+      checks.forEach(result => {
+        if (result.status === 'fulfilled' && result.value.hasRated) {
+          ratedImageIds.add(result.value.imageId);
+        }
+      });
+      
+      setUserRatedImages(ratedImageIds);
+    } catch (error) {
+      console.error('Error checking user rating status:', error);
+    } finally {
+      setRatingStatusLoading(false);
+    }
+  };
 
   const fetchLeaderboardData = async () => {
     try {
@@ -225,6 +258,18 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
     }
   }, [submittedEntryId]);
 
+  // Check user rating status when images load or active category changes
+  useEffect(() => {
+    if (images.length > 0) {
+      const currentCategoryImages = categorizedImages[activeCategory] || [];
+      const imageIds = currentCategoryImages.map(img => img.id);
+      
+      if (imageIds.length > 0) {
+        checkUserRatingStatus(imageIds);
+      }
+    }
+  }, [images, activeCategory]);
+
   const handleRefresh = () => {
     setRefreshKey(prev => prev + 1);
   };
@@ -246,6 +291,9 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
             : img
         )
       );
+      
+      // Mark this image as rated by the current user
+      setUserRatedImages(prev => new Set(prev).add(mobileRatingImage.id));
     }
     
     // Close modal
@@ -491,7 +539,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                   {image.username}
                                 </TableCell>
                                 <TableCell className="text-center hidden sm:table-cell min-w-[200px]">
-                                  {image.isUnrated || image.rating_count < MIN_RATINGS_FOR_RANKING ? (
+                                  {!userRatedImages.has(image.id) ? (
                                     <ErrorBoundary>
                                       <InlineRatingSlider 
                                         imageId={image.id}
@@ -514,6 +562,9 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                             );
                                           }
                                           
+                                          // Mark this image as rated by the current user
+                                          setUserRatedImages(prev => new Set(prev).add(image.id));
+                                          
                                           // Also trigger full refresh to ensure consistency
                                           // Delayed to allow confetti animation to complete
                                           setTimeout(() => {
@@ -532,7 +583,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                                 </TableCell>
                                 {/* Mobile rating button - shows when rate column is hidden */}
                                 <TableCell className="text-center sm:hidden">
-                                  {image.isUnrated || image.rating_count < MIN_RATINGS_FOR_RANKING ? (
+                                  {!userRatedImages.has(image.id) ? (
                                     <Button 
                                       size="sm" 
                                       variant="outline"
