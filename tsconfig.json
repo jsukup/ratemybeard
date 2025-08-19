@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2020",
+    "lib": ["dom", "dom.iterable", "es6"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -18,21 +19,37 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
-    },
-    "typeRoots": ["./node_modules/@types", "./types"]
+      "@shared/*": ["./shared/*"],
+      "@shared": ["./shared"],
+      "@web/*": ["./web/*"],
+      "@mobile/*": ["./mobile/*"]
+    }
   },
   "include": [
-    "next-env.d.ts", 
-    "**/*.ts", 
-    "**/*.tsx", 
-    ".next/types/**/*.ts", 
-    "types.d.ts",
-    "global.d.ts",
-    "types/*.d.ts",
-    "react-types.d.ts",
-    "lucide-react.d.ts"
+    "shared/**/*",
+    "web/**/*",
+    "mobile/**/*",
+    "*.ts",
+    "*.tsx"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "web/node_modules",
+    "mobile/node_modules",
+    "shared/node_modules",
+    "web/.next",
+    "mobile/.expo",
+    "dist",
+    "build"
+  ],
+  "references": [
+    {
+      "path": "./shared"
+    },
+    {
+      "path": "./web"
+    }
+  ]
 }

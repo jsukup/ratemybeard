@@ -1,0 +1,25 @@
+{
+  "name": "@ratemyfeet/shared",
+  "version": "1.0.0",
+  "description": "Shared types, utilities, and constants for RateMyFeet web and mobile apps",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.8",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.69",
+    "typescript": "^5.4.5"
+  },
+  "peerDependencies": {
+    "react": "18.2.0"
+  }
+}
