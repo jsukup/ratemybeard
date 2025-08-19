@@ -194,7 +194,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
         // Fetch rated images for categories
         getLeaderboardData({
           minRatings: MIN_RATINGS_FOR_RANKING,
-          limit: 1000,
+          limit: 10000,
           sortBy: 'median_score',
           sortOrder: 'desc',
           includeUnrated: false
@@ -202,7 +202,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
         // Fetch unrated images for "Newest" tab
         getLeaderboardData({
           minRatings: 0,
-          limit: 100,
+          limit: 10000,
           sortBy: 'created_at',
           sortOrder: 'desc',
           includeUnrated: true

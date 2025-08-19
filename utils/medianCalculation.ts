@@ -328,7 +328,7 @@ export async function getLeaderboardData(options: {
 
     const {
       minRatings = 10,
-      limit = 50,
+      limit = 500,
       offset = 0,
       sortBy = 'created_at',
       sortOrder = 'desc',
