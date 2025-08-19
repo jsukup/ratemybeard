@@ -1,37 +1,30 @@
+import { SessionManager, type StorageInterface } from '@shared/utils/sessionManager';
 import { supabase } from '@/lib/supabase';
 
-/**
- * Generate and store a unique session ID in localStorage
- */
-export function getSessionId(): string {
-  // Check if we're in a browser environment
-  if (typeof window === 'undefined') {
-    // For SSR, return a temporary session ID
-    return `temp_session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+// Create a web-specific storage implementation for localStorage
+class WebStorage implements StorageInterface {
+  async getItem(key: string): Promise<string | null> {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(key);
   }
 
-  const SESSION_KEY = 'ratemyfeet_session_id';
-  
-  let sessionId = localStorage.getItem(SESSION_KEY);
-  
-  if (!sessionId) {
-    // Generate new session ID with timestamp and random string
-    sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem(SESSION_KEY, sessionId);
+  async setItem(key: string, value: string): Promise<void> {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(key, value);
   }
-  
-  return sessionId;
+
+  async removeItem(key: string): Promise<void> {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(key);
+  }
 }
 
-/**
- * Clear the current session (useful for testing or logout)
- */
-export function clearSession(): void {
-  if (typeof window === 'undefined') return;
-  
-  const SESSION_KEY = 'ratemyfeet_session_id';
-  localStorage.removeItem(SESSION_KEY);
-}
+// Initialize session manager with web storage
+const sessionManager = new SessionManager(new WebStorage());
+
+// Export session management functions
+export const getSessionId = () => sessionManager.getSessionId();
+export const clearSession = () => sessionManager.clearSession();
 
 /**
  * Check if the current session has already rated a specific image

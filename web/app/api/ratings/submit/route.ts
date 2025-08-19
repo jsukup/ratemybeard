@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { updateImageMedianScore } from '@/utils/medianCalculation';
+import { updateImageMedianScore } from '@shared/utils/medianCalculation';
 
 // Rate limiting: 50 ratings per day per IP
 const DAILY_RATING_LIMIT = 50;

@@ -10,15 +10,18 @@ export interface EnvironmentProvider {
   getEnvVar: (key: string) => string | undefined;
 }
 
-// Default web environment provider
-const defaultWebEnvironment: EnvironmentProvider = {
-  getEnvVar: (key: string) => {
+// Web environment provider class
+export class WebEnvironmentProvider implements EnvironmentProvider {
+  getEnvVar(key: string): string | undefined {
     if (typeof process !== 'undefined' && process.env) {
       return process.env[key];
     }
     return undefined;
   }
-};
+}
+
+// Default web environment provider
+const defaultWebEnvironment: EnvironmentProvider = new WebEnvironmentProvider();
 
 /**
  * Supabase client factory with platform-agnostic configuration
@@ -209,71 +212,6 @@ export function initializeSupabase(environmentProvider?: EnvironmentProvider): S
   return SupabaseClientFactory.getClient();
 }
 
-/**
- * Database utility functions
- */
-export async function getLeaderboardData(
-  supabaseClient: SupabaseClient,
-  options: {
-    minRatings?: number;
-    limit?: number;
-    offset?: number;
-    sortBy?: 'median_score' | 'rating_count' | 'created_at';
-    sortOrder?: 'asc' | 'desc';
-    category?: string;
-    includeUnrated?: boolean;
-  } = {}
-) {
-  const {
-    minRatings = 10,
-    limit = 500,
-    offset = 0,
-    sortBy = 'created_at',
-    sortOrder = 'desc',
-    category,
-    includeUnrated = false
-  } = options;
-
-  try {
-    // Build base query
-    let query = supabaseClient
-      .from('images')
-      .select('id, username, image_url, median_score, rating_count, created_at, is_visible')
-      .eq('is_visible', true);
-
-    // Apply minimum ratings filter if not including unrated images
-    if (!includeUnrated) {
-      query = query.gte('rating_count', minRatings);
-    }
-
-    // Apply sorting and pagination
-    query = query
-      .order(sortBy, { ascending: sortOrder === 'asc' })
-      .range(offset, offset + limit - 1);
-
-    const { data: images, error } = await query;
-
-    if (error) {
-      console.error('Error fetching leaderboard data:', error);
-      return null;
-    }
-
-    return {
-      data: images || [],
-      pagination: {
-        total: images?.length || 0,
-        page: Math.floor(offset / limit) + 1,
-        limit,
-        totalPages: Math.ceil((images?.length || 0) / limit),
-        hasNext: (images?.length || 0) === limit,
-        hasPrev: offset > 0,
-      },
-    };
-  } catch (error) {
-    console.error('Error in getLeaderboardData:', error);
-    return null;
-  }
-}
 
 // Re-export types from @supabase/supabase-js for convenience
 export type { SupabaseClient, RealtimeChannel, User, Session } from '@supabase/supabase-js';

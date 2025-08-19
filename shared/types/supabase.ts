@@ -44,6 +44,13 @@ export interface RatingSubmission {
   rating: number;
 }
 
+export interface RatingSubmissionData {
+  rating: number;
+  imageId: string;
+  sessionId: string;
+  ipAddress?: string;
+}
+
 export interface RatingResponse {
   success: boolean;
   rating: {

@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { getRatingCategory } from '@shared/utils/rating';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -30,3 +31,6 @@ export function getRatingBgColor(score: number): string {
   if (score >= 4.0) return "bg-orange-50 border-orange-200";
   return "bg-red-50 border-red-200";
 }
+
+// Re-export shared utilities
+export { getRatingCategory, validateRating, formatRating } from '@shared/utils/rating';

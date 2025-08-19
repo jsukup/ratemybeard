@@ -68,6 +68,19 @@ export interface ApiResponse<T = any> {
 }
 
 // Leaderboard data types
+export interface LeaderboardImage {
+  id: string;
+  username: string;
+  image_url: string;
+  image_name?: string;
+  median_score?: number;
+  rating_count: number;
+  is_visible: boolean;
+  created_at: string;
+  rank?: number;
+  category?: string;
+}
+
 export interface LeaderboardDataParams {
   minRatings?: number;
   limit?: number;

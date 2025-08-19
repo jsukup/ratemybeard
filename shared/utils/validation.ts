@@ -187,5 +187,17 @@ export function validatePagination(params: unknown): ValidationResult<{
   sortBy: 'created_at' | 'median_score' | 'rating_count';
   sortOrder: 'asc' | 'desc';
 }> {
-  return validateSchema(paginationSchema, params);
+  const result = paginationSchema.safeParse(params || {});
+  
+  if (result.success) {
+    return {
+      success: true,
+      data: result.data
+    };
+  }
+  
+  return {
+    success: false,
+    error: result.error.errors.map(e => e.message).join(', ')
+  };
 }

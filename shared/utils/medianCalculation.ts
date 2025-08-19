@@ -72,7 +72,7 @@ export async function fetchImageRatings(imageId: string, supabase: SupabaseClien
     }
 
     return ratings ? ratings.map(r => r.rating) : [];
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in fetchImageRatings:', {
       message: error?.message || 'Unknown error',
       details: error?.details || 'No details available',
@@ -122,7 +122,7 @@ export async function updateImageMedianScore(imageId: string, supabase: Supabase
     console.log(`Updated image ${imageId}: median=${median}, count=${count}`);
     return { median, count };
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in updateImageMedianScore:', {
       message: error?.message || 'Unknown error',
       details: error?.details || 'No details available',
@@ -134,15 +134,196 @@ export async function updateImageMedianScore(imageId: string, supabase: Supabase
   }
 }
 
+// getCategoryFromPercentile moved to constants/categories.ts to avoid duplication
+
 /**
- * Determine category based on percentile ranking
+ * Get leaderboard data with median scores and categories
  */
-export function getCategoryFromPercentile(percentile: number): string {
-  if (percentile >= 90) return "Needs Work";
-  if (percentile >= 70) return "Below Average";  
-  if (percentile >= 30) return "Average";
-  if (percentile >= 10) return "Beautiful";
-  return "Elite";
+export async function getLeaderboardData(supabase: SupabaseClient, options: {
+  minRatings?: number;
+  limit?: number;
+  offset?: number;
+  sortBy?: 'median_score' | 'rating_count' | 'created_at';
+  sortOrder?: 'asc' | 'desc';
+  category?: string;
+  includeUnrated?: boolean;
+} = {}): Promise<{
+  data: Array<{
+    id: string;
+    username: string;
+    image_url: string;
+    median_score: number;
+    rating_count: number;
+    created_at: string;
+    category: string;
+  }>;
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+} | null> {
+  try {
+    const {
+      minRatings = 10,
+      limit = 500,
+      offset = 0,
+      sortBy = 'created_at',
+      sortOrder = 'desc',
+      category,
+      includeUnrated = false
+    } = options;
+
+    // Calculate page number
+    const page = Math.floor(offset / limit) + 1;
+
+    // First, get total count for pagination
+    let countQuery = supabase
+      .from('images')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_visible', true)
+      .neq('moderation_status', 'hidden');
+    
+    // Only apply minimum ratings filter if not including unrated images
+    if (!includeUnrated) {
+      countQuery = countQuery.gte('rating_count', minRatings);
+    }
+    
+    const { count: totalCount, error: countError } = await countQuery;
+
+    if (countError) {
+      console.error('Error getting total count:', countError);
+      return null;
+    }
+
+    // Fetch images with pagination
+    let query = supabase
+      .from('images')
+      .select('id, username, image_url, median_score, rating_count, created_at, is_visible')
+      .eq('is_visible', true)
+      .neq('moderation_status', 'hidden');
+    
+    // Only apply minimum ratings filter if not including unrated images
+    if (!includeUnrated) {
+      query = query.gte('rating_count', minRatings);
+    }
+    
+    query = query
+      .order(sortBy, { ascending: sortOrder === 'asc' })
+      .range(offset, offset + limit - 1);
+
+    const { data: images, error } = await query;
+
+    if (error) {
+      console.error('Error fetching leaderboard data:', error);
+      return null;
+    }
+
+    const total = totalCount || 0;
+    const totalPages = Math.ceil(total / limit);
+
+    if (!images || images.length === 0) {
+      return {
+        data: [],
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages,
+          hasNext: false,
+          hasPrev: false,
+        },
+      };
+    }
+
+    // For category assignment, we need global rankings, not just current page
+    let allImagesQuery = supabase
+      .from('images')
+      .select('id, median_score, rating_count')
+      .eq('is_visible', true);
+    
+    // Only apply minimum ratings filter if not including unrated images
+    if (!includeUnrated) {
+      allImagesQuery = allImagesQuery.gte('rating_count', minRatings);
+    }
+    
+    const { data: allImages, error: allImagesError } = await allImagesQuery
+      .order('median_score', { ascending: false });
+
+    if (allImagesError) {
+      console.error('Error fetching all images for categorization:', allImagesError);
+      // Fall back to returning data without categories
+      const dataWithoutCategories = images.map(img => ({ ...img, category: 'Unknown' }));
+      return {
+        data: dataWithoutCategories,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages,
+          hasNext: page < totalPages,
+          hasPrev: page > 1,
+        },
+      };
+    }
+
+    // Create a map of image ID to category based on global ranking
+    const categoryMap = new Map<string, string>();
+    if (allImages) {
+      // First, separate rated and unrated images
+      const ratedImages = allImages.filter(img => img.rating_count >= minRatings);
+      const unratedImages = allImages.filter(img => img.rating_count < minRatings);
+      
+      // Assign categories to rated images based on percentile
+      ratedImages.forEach((image, index) => {
+        const percentile = (index / ratedImages.length) * 100;
+        
+        let category: string;
+        if (percentile >= 90) category = "Dregs";
+        else if (percentile >= 70) category = "Plebs";
+        else if (percentile >= 30) category = "Mehs";  
+        else if (percentile >= 10) category = "Monets";
+        else category = "Smoke Shows";
+
+        categoryMap.set(image.id, category);
+      });
+      
+      // Assign "Unrated" category to images without enough ratings
+      unratedImages.forEach(image => {
+        categoryMap.set(image.id, "Unrated");
+      });
+    }
+
+    // Assign categories to current page images
+    const categorizedImages = images.map(image => ({
+      ...image,
+      category: categoryMap.get(image.id) || 'Unknown',
+    }));
+
+    // Filter by category if specified
+    const filteredImages = category 
+      ? categorizedImages.filter(img => img.category === category)
+      : categorizedImages;
+
+    return {
+      data: filteredImages,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    };
+    
+  } catch (error: any) {
+    console.error('Error in getLeaderboardData:', error);
+    return null;
+  }
 }
 
 /**
