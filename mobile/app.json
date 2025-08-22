@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "RateMyFeet Mobile",
+    "slug": "ratemyfeet-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -24,6 +24,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "NEXT_PUBLIC_SUPABASE_URL": "https://vaxbfvsgzqruuhnntrsy.supabase.co",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZheGJmdnNnenFydXVobm50cnN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyMDM1MTksImV4cCI6MjA2NTc3OTUxOX0.jFWE8JkcWU3YvYKSrndiqfkUlOz_Vik0XzUCLOvaOoI"
     }
   }
 }

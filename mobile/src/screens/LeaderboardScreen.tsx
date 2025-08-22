@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, RefreshControl, Alert } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
-import { getLeaderboardData } from '@shared/utils/medianCalculation';
-import { supabase } from '../services/supabase';
-import { formatRelativeTime } from '@shared/utils/formatting';
-
-type LeaderboardScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Leaderboard'>;
-
-interface Props {
-  navigation: LeaderboardScreenNavigationProp;
-}
+import { View, Text, ScrollView, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
 
 interface LeaderboardEntry {
   id: string;
@@ -18,298 +7,188 @@ interface LeaderboardEntry {
   image_url: string;
   median_score: number;
   rating_count: number;
-  created_at: string;
   category: string;
 }
 
-export default function LeaderboardScreen({ navigation }: Props) {
-  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+export default function LeaderboardScreen() {
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadLeaderboard = async () => {
+    try {
+      // TODO: Implement leaderboard loading using shared package
+      // For now, show placeholder data
+      const placeholderData: LeaderboardEntry[] = [
+        {
+          id: '1',
+          username: 'user1',
+          image_url: '',
+          median_score: 8.5,
+          rating_count: 25,
+          category: 'Smoke Shows'
+        },
+        {
+          id: '2',
+          username: 'user2',
+          image_url: '',
+          median_score: 7.2,
+          rating_count: 18,
+          category: 'Monets'
+        },
+        {
+          id: '3',
+          username: 'user3',
+          image_url: '',
+          median_score: 6.8,
+          rating_count: 12,
+          category: 'Monets'
+        },
+      ];
+      
+      setLeaderboard(placeholderData);
+    } catch (error) {
+      console.error('Failed to load leaderboard:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     loadLeaderboard();
-  }, [selectedCategory]);
+  }, []);
 
-  const loadLeaderboard = async (refreshing = false) => {
-    try {
-      if (!refreshing) setIsLoading(true);
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadLeaderboard();
+  };
 
-      const result = await getLeaderboardData(supabase, {
-        minRatings: 1, // Lower threshold for mobile demo
-        limit: 50,
-        offset: 0,
-        sortBy: 'median_score',
-        sortOrder: 'desc',
-        includeUnrated: selectedCategory === 'all',
-      });
-
-      if (result?.data) {
-        let filteredData = result.data;
-        
-        // Filter by category if not 'all'
-        if (selectedCategory !== 'all') {
-          filteredData = result.data.filter(item => 
-            item.category.toLowerCase() === selectedCategory.toLowerCase()
-          );
-        }
-
-        setLeaderboardData(filteredData);
-      } else {
-        setLeaderboardData([]);
-      }
-    } catch (error) {
-      console.error('Error loading leaderboard:', error);
-      Alert.alert('Error', 'Failed to load leaderboard data');
-      setLeaderboardData([]);
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'Smoke Shows': return '#FFD700';
+      case 'Monets': return '#C0C0C0';
+      case 'Mehs': return '#CD7F32';
+      case 'Plebs': return '#808080';
+      case 'Dregs': return '#654321';
+      default: return '#666';
     }
   };
 
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    loadLeaderboard(true);
-  };
-
-  const handleImagePress = (item: LeaderboardEntry) => {
-    // Navigate to rating screen for this image
-    navigation.navigate('Rating', {
-      imageId: item.id,
-      username: item.username,
-      imageUrl: item.image_url,
-    });
-  };
-
-  const getCategoryEmoji = (category: string): string => {
-    switch (category.toLowerCase()) {
-      case 'smoke shows': return '🔥';
-      case 'monets': return '🎨';
-      case 'mehs': return '😐';
-      case 'plebs': return '👎';
-      case 'dregs': return '💩';
-      case 'unrated': return '⏳';
-      default: return '❓';
-    }
-  };
-
-  const getCategoryColor = (category: string): string => {
-    switch (category.toLowerCase()) {
-      case 'smoke shows': return '#dc3545';
-      case 'monets': return '#fd7e14';
-      case 'mehs': return '#ffc107';
-      case 'plebs': return '#6c757d';
-      case 'dregs': return '#28a745';
-      case 'unrated': return '#17a2b8';
-      default: return '#6c757d';
-    }
-  };
-
-  const renderLeaderboardItem = ({ item, index }: { item: LeaderboardEntry; index: number }) => (
-    <TouchableOpacity
-      style={styles.leaderboardItem}
-      onPress={() => handleImagePress(item)}
-    >
-      <View style={styles.rankContainer}>
-        <Text style={styles.rankText}>#{index + 1}</Text>
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={styles.loadingText}>Loading leaderboard...</Text>
       </View>
-
-      <Image source={{ uri: item.image_url }} style={styles.itemImage} />
-
-      <View style={styles.itemInfo}>
-        <Text style={styles.usernameText}>{item.username}</Text>
-        <View style={styles.scoreContainer}>
-          <Text style={styles.scoreText}>
-            {item.median_score ? `${item.median_score}/10` : 'No ratings'}
-          </Text>
-          <Text style={styles.ratingCountText}>
-            ({item.rating_count} rating{item.rating_count !== 1 ? 's' : ''})
-          </Text>
-        </View>
-        <View style={styles.categoryContainer}>
-          <Text style={[styles.categoryText, { backgroundColor: getCategoryColor(item.category) }]}>
-            {getCategoryEmoji(item.category)} {item.category}
-          </Text>
-        </View>
-        <Text style={styles.timeText}>
-          {formatRelativeTime(new Date(item.created_at))}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const categories = ['all', 'smoke shows', 'monets', 'mehs', 'plebs', 'dregs', 'unrated'];
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      {/* Category Filter */}
-      <View style={styles.filterContainer}>
-        <FlatList
-          horizontal
-          data={categories}
-          keyExtractor={(item) => item}
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[
-                styles.categoryButton,
-                selectedCategory === item && styles.selectedCategoryButton
-              ]}
-              onPress={() => setSelectedCategory(item)}
-            >
-              <Text style={[
-                styles.categoryButtonText,
-                selectedCategory === item && styles.selectedCategoryText
-              ]}>
-                {item === 'all' ? 'All' : `${getCategoryEmoji(item)} ${item}`}
-              </Text>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
-
-      {/* Leaderboard List */}
-      <FlatList
-        data={leaderboardData}
-        keyExtractor={(item) => item.id}
-        renderItem={renderLeaderboardItem}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefresh}
-            tintColor="#007AFF"
-          />
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
-              {isLoading ? 'Loading...' : 'No images found'}
+    <ScrollView 
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <Text style={styles.title}>Top Rated Images</Text>
+      
+      {leaderboard.map((entry, index) => (
+        <View key={entry.id} style={styles.entryContainer}>
+          <View style={styles.rankContainer}>
+            <Text style={styles.rank}>#{index + 1}</Text>
+          </View>
+          
+          <View style={styles.infoContainer}>
+            <Text style={styles.username}>{entry.username}</Text>
+            <Text style={[
+              styles.category,
+              { color: getCategoryColor(entry.category) }
+            ]}>
+              {entry.category}
+            </Text>
+            <Text style={styles.score}>
+              {entry.median_score.toFixed(1)}/10 ({entry.rating_count} ratings)
             </Text>
           </View>
-        }
-        contentContainerStyle={leaderboardData.length === 0 ? styles.emptyList : undefined}
-      />
-    </View>
+        </View>
+      ))}
+      
+      {leaderboard.length === 0 && (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No images have been rated yet</Text>
+        </View>
+      )}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  filterContainer: {
     backgroundColor: '#fff',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    padding: 20,
   },
-  categoryButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    marginHorizontal: 5,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#dee2e6',
-  },
-  selectedCategoryButton: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
-  },
-  categoryButtonText: {
-    fontSize: 14,
-    color: '#6c757d',
-    fontWeight: '500',
-  },
-  selectedCategoryText: {
-    color: '#fff',
-  },
-  leaderboardItem: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    marginHorizontal: 15,
-    marginVertical: 5,
-    padding: 15,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  rankContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 40,
-    marginRight: 15,
-  },
-  rankText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#007AFF',
-  },
-  itemImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    backgroundColor: '#e9ecef',
-  },
-  itemInfo: {
+  loadingContainer: {
     flex: 1,
-    marginLeft: 15,
     justifyContent: 'center',
-  },
-  usernameText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  scoreContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
   },
-  scoreText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#007AFF',
-    marginRight: 8,
-  },
-  ratingCountText: {
-    fontSize: 12,
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
     color: '#666',
   },
-  categoryContainer: {
-    marginBottom: 4,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
   },
-  categoryText: {
-    fontSize: 12,
-    color: '#fff',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+  entryContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#f8f8f8',
     borderRadius: 10,
-    alignSelf: 'flex-start',
-    overflow: 'hidden',
+    padding: 15,
+    marginBottom: 10,
+    alignItems: 'center',
   },
-  timeText: {
-    fontSize: 12,
-    color: '#999',
+  rankContainer: {
+    width: 50,
+    alignItems: 'center',
+  },
+  rank: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#007AFF',
+  },
+  infoContainer: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  username: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 5,
+  },
+  category: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 5,
+  },
+  score: {
+    fontSize: 14,
+    color: '#666',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 50,
+    paddingTop: 50,
   },
   emptyText: {
     fontSize: 16,
     color: '#666',
-  },
-  emptyList: {
-    flex: 1,
+    textAlign: 'center',
   },
 });

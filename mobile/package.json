@@ -16,30 +16,18 @@
     "submit:ios": "eas submit --platform ios",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx --fix",
-    "prebuild": "npm run type-check",
-    "postinstall": "cd .. && npm run build:shared"
+    "prebuild": "npm run type-check"
   },
   "dependencies": {
-    "@ratemyfeet/shared": "*",
-    "@react-native-async-storage/async-storage": "^2.1.4",
-    "@react-navigation/native": "^6.1.9",
-    "@react-navigation/stack": "^6.3.20",
-    "@supabase/supabase-js": "^2.39.8",
     "expo": "~53.0.20",
-    "expo-camera": "~16.0.2",
-    "expo-image-picker": "~16.0.2",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
-    "react-native": "0.79.5",
-    "react-native-gesture-handler": "~2.20.2",
-    "react-native-reanimated": "^4.0.2",
-    "react-native-safe-area-context": "4.14.0",
-    "react-native-screens": "~4.3.0",
-    "react-native-vector-icons": "^10.3.0"
+    "react-native": "0.79.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.0.10",
+    "babel-plugin-module-resolver": "^5.0.2",
     "typescript": "~5.8.3"
   },
   "private": true
