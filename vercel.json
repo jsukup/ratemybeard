@@ -1,16 +1,18 @@
 {
   "version": 2,
-  "buildCommand": "next build",
-  "outputDirectory": ".next",
+  "buildCommand": "npm run build:shared && cd web && npm run build",
+  "outputDirectory": "web/.next",
+  "installCommand": "npm install",
+  "devCommand": "cd web && npm run dev",
   "framework": "nextjs",
   "functions": {
-    "app/api/ratings/submit/route.ts": {
+    "web/app/api/ratings/submit/route.ts": {
       "maxDuration": 30
     },
-    "app/api/reports/submit/route.ts": {
+    "web/app/api/reports/submit/route.ts": {
       "maxDuration": 30
     },
-    "app/api/admin/reports/route.ts": {
+    "web/app/api/admin/reports/route.ts": {
       "maxDuration": 30
     }
   },
@@ -19,4 +21,4 @@
     "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZheGJmdnNnenFydXVobm50cnN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyMDM1MTksImV4cCI6MjA2NTc3OTUxOX0.jFWE8JkcWU3YvYKSrndiqfkUlOz_Vik0XzUCLOvaOoI",
     "NEXT_PUBLIC_ENABLE_DISCRETE_RATINGS": "false"
   }
-} 
+}
