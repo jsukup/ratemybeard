@@ -53,6 +53,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@expo/config-plugins": "^10.1.2",
     "@supabase/supabase-js": "^2.39.8",
     "zod": "^3.23.8"
   },
