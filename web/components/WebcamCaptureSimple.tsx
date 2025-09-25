@@ -7,6 +7,7 @@ import Webcam from "react-webcam";
 import { isMobile } from 'react-device-detect';
 import { supabase } from '@/lib/supabase-client';
 import UsernameInput from './UsernameInput';
+import { cleanUrl } from '@/utils/urlValidation';
 
 // Utility function to convert data URL to File object
 function dataURLtoFile(dataurl: string, filename: string): File {
@@ -339,12 +340,15 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
         .from('images')
         .getPublicUrl(fileName);
       
+      // Clean the public URL to ensure no whitespace issues
+      const cleanPublicUrl = cleanUrl(publicUrl);
+      
       // Save image record to database
       const { data: imageData, error: dbError } = await supabase
         .from('images')
         .insert({
           username: username.trim(),
-          image_url: publicUrl,
+          image_url: cleanPublicUrl, // Use the cleaned URL
           median_score: 0,
           rating_count: 0,
           is_visible: true
@@ -361,7 +365,7 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
       onImageUploaded?.({
         id: imageData.id,
         username: imageData.username,
-        image_url: imageData.image_url
+        image_url: cleanPublicUrl // Use the cleaned URL consistently
       });
       
       // Reset component state
