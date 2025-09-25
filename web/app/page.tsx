@@ -346,7 +346,7 @@ function HomeContent() {
                   className="inline-block hover:scale-105 transition-transform duration-200"
                 >
                   <img 
-                    src="/images/ratemyfeet-logo.png" 
+                    src="/ratemyfeet-logo.png" 
                     alt="RateMyFeet Logo" 
                     className="h-6 sm:h-8 md:h-10 drop-shadow-lg hover:drop-shadow-xl transition-all duration-200"
                   />
