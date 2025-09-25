@@ -3,12 +3,11 @@
   "/api/admin/daily-digest/route": "app/api/admin/daily-digest/route.js",
   "/api/admin/delete-image/route": "app/api/admin/delete-image/route.js",
   "/api/admin/reports/route": "app/api/admin/reports/route.js",
-  "/api/debug-env/route": "app/api/debug-env/route.js",
   "/api/ratings/submit/route": "app/api/ratings/submit/route.js",
-  "/api/reports/submit/route": "app/api/reports/submit/route.js",
   "/api/supabase-test/route": "app/api/supabase-test/route.js",
-  "/image-policy/page": "app/image-policy/page.js",
+  "/api/reports/submit/route": "app/api/reports/submit/route.js",
   "/admin/page": "app/admin/page.js",
   "/page": "app/page.js",
+  "/image-policy/page": "app/image-policy/page.js",
   "/privacy/page": "app/privacy/page.js"
 }

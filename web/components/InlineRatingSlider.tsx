@@ -21,13 +21,8 @@ export function InlineRatingSlider({
   onRatingSubmit,
   className = "" 
 }: InlineRatingSliderProps) {
-  // Feature flag for discrete ratings
-  const rawEnvValue = process.env.NEXT_PUBLIC_ENABLE_DISCRETE_RATINGS;
-  const useDiscreteRatings = rawEnvValue === 'true';
-  
-  // Debug logging 
-  console.log('[DEBUG] InlineRatingSlider - Raw env value:', JSON.stringify(rawEnvValue));
-  console.log('[DEBUG] InlineRatingSlider - Use discrete ratings:', useDiscreteRatings);
+  // Feature flag for discrete ratings - TEMPORARY HARDCODE TO TEST
+  const useDiscreteRatings = true;
   
   // Legacy slider state
   const [rating, setRating] = useState<number[]>([5.0]);
