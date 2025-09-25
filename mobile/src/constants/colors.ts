@@ -1,5 +1,5 @@
 /**
- * RateMyFeet Mobile Color Constants
+ * RateMyBeard Mobile Color Constants
  * Matches the website brand color scheme
  */
 

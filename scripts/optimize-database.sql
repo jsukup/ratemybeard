@@ -1,4 +1,4 @@
--- Database Optimization Script for RateMyFeet
+-- Database Optimization Script for RateMyBeard
 -- This script creates indexes to improve query performance
 
 -- ============================================

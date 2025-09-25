@@ -51,7 +51,7 @@ export default function MainTabNavigator() {
         name="Home"
         component={HomeScreen}
         options={{
-          title: 'RateMyFeet',
+          title: 'RateMyBeard',
           tabBarIcon: HomeIcon,
         }}
       />

@@ -1,4 +1,4 @@
-# RateMyFeet Mobile App Deployment Guide
+# RateMyBeard Mobile App Deployment Guide
 
 ## Prerequisites
 

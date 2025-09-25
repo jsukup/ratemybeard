@@ -6,42 +6,42 @@ export const CATEGORY_CONFIGS = [
         name: "Newest",
         label: "Latest Uploads",
         icon: null,
-        color: "bg-gradient-to-r from-emerald-500 to-green-500",
+        color: "bg-gradient-to-r from-lime-400 to-green-400",
         description: "Fresh uploads waiting for ratings - be the first to rate!"
     },
     {
         name: "Elite",
         label: "Revered Beards",
         icon: null,
-        color: "bg-gradient-to-r from-yellow-400 to-amber-500",
+        color: "bg-gradient-to-r from-yellow-300 to-orange-400",
         description: "Top 10% - The absolute finest beards you'll find here"
     },
     {
         name: "Beautiful",
         label: "Brisker Whiskers",
         icon: null,
-        color: "bg-gradient-to-r from-purple-500 to-pink-500",
+        color: "bg-gradient-to-r from-fuchsia-400 to-purple-500",
         description: "Top 11-30% - Genuinely attractive and well-maintained"
     },
     {
         name: "Average",
-        label: "Tuff Scruff",
+        label: "Tuff\nScruff",
         icon: null,
-        color: "bg-gradient-to-r from-blue-500 to-cyan-500",
+        color: "bg-gradient-to-r from-cyan-400 to-blue-500",
         description: "Middle 31-70% - Your fake ID probably works"
     },
     {
         name: "Below Average",
         label: "Chin Pubes",
         icon: null,
-        color: "bg-gradient-to-r from-orange-500 to-red-400",
+        color: "bg-gradient-to-r from-orange-400 to-red-500",
         description: "Bottom 71-90% - Help society. Shave already!"
     },
     {
         name: "Needs Work",
         label: "Prepubescent",
         icon: null,
-        color: "bg-gradient-to-r from-red-500 to-rose-600",
+        color: "bg-gradient-to-r from-red-400 to-pink-500",
         description: "Bottom 10% - Are you a baby?"
     },
 ];

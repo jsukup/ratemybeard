@@ -6,10 +6,10 @@ export * from './api';
 export const PLATFORM_DEFAULTS = {
     // Storage keys (may differ between web localStorage and mobile AsyncStorage)
     STORAGE_KEYS: {
-        SESSION_ID: 'ratemyfeet_session_id',
-        USER_PREFERENCES: 'ratemyfeet_user_preferences',
-        CACHE_PREFIX: 'ratemyfeet_cache_',
-        LAST_SYNC: 'ratemyfeet_last_sync',
+        SESSION_ID: 'ratemybeard_session_id',
+        USER_PREFERENCES: 'ratemybeard_user_preferences',
+        CACHE_PREFIX: 'ratemybeard_cache_',
+        LAST_SYNC: 'ratemybeard_last_sync',
     },
     // Image handling
     IMAGE_QUALITY: {

@@ -1,6 +1,6 @@
 # RateMyBeard Supabase Database Setup Guide
 
-This guide will help you create a new Supabase database for the RateMyBeard platform by cloning the existing RateMyFeet database structure.
+This guide will help you create a new Supabase database for the RateMyBeard platform by cloning the existing RateMyBeard database structure.
 
 ## Overview
 

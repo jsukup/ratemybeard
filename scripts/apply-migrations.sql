@@ -1,4 +1,4 @@
--- Combined Migration Script for RateMyFeet Database Functions
+-- Combined Migration Script for RateMyBeard Database Functions
 -- Apply this script in Supabase SQL Editor to set up all necessary functions
 -- This will enable the API to use database functions instead of JavaScript calculations
 

@@ -1,8 +1,8 @@
 # Overview
 
-RateMyFeet is a lighthearted web platform that allows users to rate the attractiveness of feet through user-generated scoring. Unlike its predecessor which used AI-based facial attractiveness scoring, this platform leverages human judgment to provide subjective ratings.
+RateMyBeard is a lighthearted web platform that allows users to rate the attractiveness of beards through user-generated scoring. Unlike its predecessor which used AI-based facial attractiveness scoring, this platform leverages human judgment to provide subjective ratings.
 
-The platform targets a general audience interested in foot aesthetics, offering an entertaining way for users to engage with and rate foot images. While not solving a critical problem, the platform serves as an engaging pastime where users can share their opinions and discover how others perceive foot attractiveness.
+The platform targets a general audience interested in beard aesthetics, offering an entertaining way for users to engage with and rate beard images. While not solving a critical problem, the platform serves as an engaging pastime where users can share their opinions and discover how others perceive beard attractiveness.
 
 # Core Features
 
@@ -104,7 +104,7 @@ The platform targets a general audience interested in foot aesthetics, offering 
 3. Branding Updates
    - Remove 'looxmaxx' references
    - Update logos and branding elements
-   - Implement new RateMyFeet branding
+   - Implement new RateMyBeard branding
 
 # Development Roadmap
 

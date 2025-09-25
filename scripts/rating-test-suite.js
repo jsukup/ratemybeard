@@ -47,7 +47,7 @@ class RatingTestSuite {
    * Display test suite header
    */
   displayHeader() {
-    const title = 'RATEMYFEET RATING SYSTEM TEST SUITE';
+    const title = 'RATEMYBEARD RATING SYSTEM TEST SUITE';
     const border = '═'.repeat(title.length + 4);
     
     console.log('\n' + border);
@@ -441,7 +441,7 @@ class RatingTestSuite {
       }
     };
 
-    const reportPath = `/root/ratemyfeet/test-reports/rating-suite-${this.suiteId}.json`;
+    const reportPath = `/root/ratemybeard/test-reports/rating-suite-${this.suiteId}.json`;
     
     try {
       const fs = require('fs');

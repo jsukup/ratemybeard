@@ -3,10 +3,10 @@ export * from './categories';
 export * from './api';
 export declare const PLATFORM_DEFAULTS: {
     readonly STORAGE_KEYS: {
-        readonly SESSION_ID: "ratemyfeet_session_id";
-        readonly USER_PREFERENCES: "ratemyfeet_user_preferences";
-        readonly CACHE_PREFIX: "ratemyfeet_cache_";
-        readonly LAST_SYNC: "ratemyfeet_last_sync";
+        readonly SESSION_ID: "ratemybeard_session_id";
+        readonly USER_PREFERENCES: "ratemybeard_user_preferences";
+        readonly CACHE_PREFIX: "ratemybeard_cache_";
+        readonly LAST_SYNC: "ratemybeard_last_sync";
     };
     readonly IMAGE_QUALITY: {
         readonly THUMBNAIL: 0.7;

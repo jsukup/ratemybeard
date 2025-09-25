@@ -1,7 +1,7 @@
 # Supabase Project Cloning Guide
 
 ## Overview
-Clone RateMyFeet (vaxbfvsgzqruuhnntrsy) to RateMyBeard project
+Clone RateMyBeard (vaxbfvsgzqruuhnntrsy) to RateMyBeard project
 
 ## Prerequisites
 - Access to both Supabase projects
@@ -13,7 +13,7 @@ Clone RateMyFeet (vaxbfvsgzqruuhnntrsy) to RateMyBeard project
 ### 1. Export Source Database Schema
 ```bash
 # Connect to source project
-supabase db dump --project-ref vaxbfvsgzqruuhnntrsy --schema-only > ratemyfeet-schema.sql
+supabase db dump --project-ref vaxbfvsgzqruuhnntrsy --schema-only > ratemybeard-schema.sql
 
 # Export edge functions
 supabase functions download --project-ref vaxbfvsgzqruuhnntrsy
@@ -29,7 +29,7 @@ supabase functions download --project-ref vaxbfvsgzqruuhnntrsy
 ### 3. Import to New Project
 ```bash
 # Import schema (replace NEW_PROJECT_REF with actual reference)
-supabase db push --project-ref NEW_PROJECT_REF --file ratemyfeet-schema.sql
+supabase db push --project-ref NEW_PROJECT_REF --file ratemybeard-schema.sql
 
 # Deploy edge functions
 supabase functions deploy --project-ref NEW_PROJECT_REF

@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Star } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { RatingButtonsGrid } from "@/components/RatingButtonsGrid";
+import { getOrCreateSessionId } from '@/lib/session';
 
 interface RatingSliderProps {
   imageId: string;
@@ -49,12 +50,8 @@ function RatingSliderComponent({ imageId, onSubmit, disabled = false, className 
     setSuccess(false);
 
     try {
-      // Get session ID from localStorage or generate one
-      let sessionId = localStorage.getItem('ratemyfeet_session_id');
-      if (!sessionId) {
-        sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        localStorage.setItem('ratemyfeet_session_id', sessionId);
-      }
+      // Get session ID using the proper session management function
+      const sessionId = getOrCreateSessionId();
 
       const response = await fetch('/api/ratings/submit', {
         method: 'POST',

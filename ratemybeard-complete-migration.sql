@@ -1,5 +1,5 @@
 -- RateMyBeard Complete Database Migration
--- Generated from existing RateMyFeet structure and migration files
+-- Generated from existing RateMyBeard structure and migration files
 -- This script creates the complete schema for RateMyBeard project
 -- Project: dimtnznykselivtdeicv.supabase.co
 
@@ -7,7 +7,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- =============================================================================
--- SCHEMA CREATION (Based on RateMyFeet Analysis + Existing Migrations)
+-- SCHEMA CREATION (Based on RateMyBeard Analysis + Existing Migrations)
 -- =============================================================================
 
 -- Create images table (evolved from entries table)

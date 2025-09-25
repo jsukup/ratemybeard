@@ -3,7 +3,7 @@
 /**
  * Visual Bug Fix Workflow Automation Script
  * 
- * This script provides guided workflow for fixing visual bugs in RateMyFeet
+ * This script provides guided workflow for fixing visual bugs in RateMyBeard
  * following the same methodology used for functional bug fixes.
  */
 
@@ -30,7 +30,7 @@ const visualBugs = [
     title: 'Branding Inconsistencies',
     priority: 'critical',
     files: ['app/layout.tsx'],
-    description: 'Update LooxMaxx references to RateMyFeet',
+    description: 'Update LooxMaxx references to RateMyBeard',
     phase: 1,
     estimatedTime: '30 minutes'
   },
@@ -305,7 +305,7 @@ function showToolingRecommendations() {
 
 // Main workflow functions
 function showOverview() {
-  logHeader('VISUAL BUG FIX WORKFLOW - RATEMYFEET');
+  logHeader('VISUAL BUG FIX WORKFLOW - RATEMYBEARD');
   
   log('This workflow helps you systematically fix visual bugs using the same', 'bright');
   log('methodology used for functional bug fixes.', 'bright');

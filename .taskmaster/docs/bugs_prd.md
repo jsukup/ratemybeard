@@ -1,6 +1,6 @@
 # Overview
 
-RateMyFeet currently has several critical bugs and performance issues that affect user experience, data integrity, and system reliability. This PRD identifies and prioritizes 15 major bugs across the rating system, database operations, UI components, and infrastructure that need immediate attention.
+RateMyBeard currently has several critical bugs and performance issues that affect user experience, data integrity, and system reliability. This PRD identifies and prioritizes 15 major bugs across the rating system, database operations, UI components, and infrastructure that need immediate attention.
 
 The bugs range from critical data inconsistency issues (inverted percentile calculations) to performance bottlenecks (inefficient database queries) and user experience problems (session ID mismatches preventing proper duplicate detection).
 
@@ -42,34 +42,34 @@ The bugs range from critical data inconsistency issues (inverted percentile calc
 ## Bug Categories and Affected Components
 
 ### Database Layer Issues
-- **File**: `/root/ratemyfeet/app/api/ratings/submit/route.ts`
+- **File**: `/root/ratemybeard/app/api/ratings/submit/route.ts`
   - Silent statistics update failures (lines 132-135)
   - Inefficient rate limiting queries (lines 94-95)
   - Missing error handling for RPC calls (line 161)
 
-- **File**: `/root/ratemyfeet/utils/medianCalculation.ts`
+- **File**: `/root/ratemybeard/utils/medianCalculation.ts`
   - Inverted percentile calculations (line 190)
   - Incorrect category assignments (line 288)
   - Performance issues with large datasets (lines 310-311)
 
 ### Component Layer Issues
-- **File**: `/root/ratemyfeet/components/RatingSlider.tsx`
+- **File**: `/root/ratemybeard/components/RatingSlider.tsx`
   - Session ID key mismatch (lines 47-51)
   - Redundant parsing operations (line 61)
   - Confusing disabled state display (line 195)
 
-- **File**: `/root/ratemyfeet/components/Leaderboard.tsx`
+- **File**: `/root/ratemybeard/components/Leaderboard.tsx`
   - No pagination for large datasets (lines 125-130)
   - In-memory sorting of entire dataset (line 288)
   - Performance bottlenecks with complex operations (line 312)
 
 ### Utility Layer Issues
-- **File**: `/root/ratemyfeet/utils/sessionManager.ts`
+- **File**: `/root/ratemybeard/utils/sessionManager.ts`
   - Inconsistent session key naming (line 13)
   - Error handling returns false, bypassing duplicate prevention (line 52)
 
 ### Infrastructure Issues
-- **File**: `/root/ratemyfeet/lib/supabase.ts`
+- **File**: `/root/ratemybeard/lib/supabase.ts`
   - Production warnings on every import (lines 9-11)
   - Placeholder configuration values (lines 5-6)
 

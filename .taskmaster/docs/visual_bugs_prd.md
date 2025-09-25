@@ -1,8 +1,8 @@
-# Visual/UI Bug Fixes PRD - RateMyFeet
+# Visual/UI Bug Fixes PRD - RateMyBeard
 
 ## Overview
 
-This document outlines **18 critical visual and UI bugs** identified in RateMyFeet that need systematic fixing to improve user experience, accessibility, and brand consistency. Following the same methodology used for the functional bug fixes, this PRD provides a structured approach to visual improvements.
+This document outlines **18 critical visual and UI bugs** identified in RateMyBeard that need systematic fixing to improve user experience, accessibility, and brand consistency. Following the same methodology used for the functional bug fixes, this PRD provides a structured approach to visual improvements.
 
 **Updated**: Added 6 additional user-identified bugs focusing on text clarity, logo sizing, layout optimization, and visual appeal.
 
@@ -12,7 +12,7 @@ This document outlines **18 critical visual and UI bugs** identified in RateMyFe
 - **File**: `app/layout.tsx:14-22`
 - **Issue**: HTML meta tags still reference "LooxMaxx - AI-Powered Attractiveness Analyzer"
 - **Impact**: SEO, social sharing, and browser bookmarks show wrong brand
-- **Fix**: Update all meta tags to "RateMyFeet - Rate the Attractiveness of Feet"
+- **Fix**: Update all meta tags to "RateMyBeard - Rate the Attractiveness of Beards"
 - **Urgency**: Critical - affects first impression and brand identity
 
 ### **Bug V2: Missing Alt Text for Images** 🔴  
