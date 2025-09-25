@@ -25,6 +25,7 @@ import { ImageModal } from "@/components/ImageModal";
 import { ReportModal } from "@/components/ReportModal";
 import { MobileRatingModal } from "@/components/MobileRatingModal";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { CATEGORY_CONFIGS, getCategoryConfig, getCategoryBadgeColor, mapLegacyCategory, MIN_RATINGS_FOR_RANKING } from "@/../../shared/constants/categories";
 
 // Updated interface for the new rating system
 interface LeaderboardImage {
@@ -39,61 +40,6 @@ interface LeaderboardImage {
 }
 
 type CategoryName = "Newest" | "Elite" | "Beautiful" | "Average" | "Below Average" | "Needs Work";
-
-interface CategoryConfig {
-  name: CategoryName;
-  label: string;
-  icon: React.ReactNode | null;
-  color: string;
-  description: string;
-}
-
-const CATEGORY_CONFIGS: CategoryConfig[] = [
-  { 
-    name: "Newest", 
-    label: "Latest Uploads", 
-    icon: null, 
-    color: "bg-gradient-to-r from-emerald-500 to-green-500",
-    description: "Fresh uploads waiting for ratings - be the first to rate!"
-  },
-  { 
-    name: "Elite", 
-    label: "Elite Beards", 
-    icon: null, 
-    color: "bg-gradient-to-r from-yellow-400 to-amber-500",
-    description: "Top 10% - The absolute finest beards you'll find here"
-  },
-  { 
-    name: "Beautiful", 
-    label: "Keen Kicks", 
-    icon: null, 
-    color: "bg-gradient-to-r from-purple-500 to-pink-500",
-    description: "Top 11-30% - Genuinely attractive and well-maintained"
-  },
-  { 
-    name: "Average", 
-    label: "Jiggy Piggys", 
-    icon: null, 
-    color: "bg-gradient-to-r from-blue-500 to-cyan-500",
-    description: "Middle 31-70% - Probably attracting some perv's attention"
-  },
-  { 
-    name: "Below Average", 
-    label: "Chin Chaos", 
-    icon: null, 
-    color: "bg-gradient-to-r from-orange-500 to-red-400",
-    description: "Bottom 71-90% - Are you even human?"
-  },
-  { 
-    name: "Needs Work", 
-    label: "Puke", 
-    icon: null, 
-    color: "bg-gradient-to-r from-red-500 to-rose-600",
-    description: "Bottom 10% - Consider amputation"
-  },
-];
-
-const MIN_RATINGS_FOR_RANKING = 10;
 
 interface LeaderboardProps {
   submittedEntryId?: string | null;
@@ -121,17 +67,9 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
   const [userRatedImages, setUserRatedImages] = useState<Set<string>>(new Set());
   const [ratingStatusLoading, setRatingStatusLoading] = useState(false);
 
-  // Map old category names to new ones for backward compatibility
+  // Map old category names to new ones using shared utility
   const mapOldCategoryToNew = (oldCategory: string): CategoryName => {
-    switch (oldCategory) {
-      case 'Smoke Shows': return 'Elite';
-      case 'Monets': return 'Beautiful';
-      case 'Mehs': return 'Average';
-      case 'Plebs': return 'Below Average';
-      case 'Dregs': return 'Needs Work';
-      case 'Newest': return 'Newest';
-      default: return 'Average'; // fallback
-    }
+    return mapLegacyCategory(oldCategory) as CategoryName;
   };
 
   // Categorize images by their category (with safety check and mapping)
@@ -321,10 +259,6 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
     }
   };
 
-  const getCategoryBadgeColor = (category: CategoryName) => {
-    const config = CATEGORY_CONFIGS.find(c => c.name === category);
-    return config?.color || 'bg-gray-500';
-  };
 
   if (loading) {
     return (

@@ -17,7 +17,7 @@ export default function ImageDetailScreen({ route, navigation }: Props) {
     username: 'user123',
     medianScore: 7.8,
     totalRatings: 42,
-    category: 'Elite Beards',
+    category: 'Revered Beards',
     createdAt: '2024-01-15',
   };
 
