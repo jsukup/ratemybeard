@@ -346,15 +346,19 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                   relative group overflow-hidden rounded-lg md:rounded-xl p-2 md:p-4 lg:p-5 transition-all duration-300 ease-out
                   transform hover:scale-105 hover:shadow-xl active:scale-95
                   border-2 text-white font-semibold text-xs md:text-sm lg:text-base
-                  ${
-                    isActive 
-                      ? `${config.color} border-white shadow-lg scale-105` 
-                      : `${config.color} border-transparent opacity-80 hover:opacity-100`
-                  }
+                  ${isActive ? 'shadow-lg scale-105 border-white' : 'border-transparent opacity-90 hover:opacity-100'}
                 `}
+                style={{
+                  background: config.name === "Newest" ? "linear-gradient(to right, rgb(163, 230, 53), rgb(34, 197, 94))" :
+                            config.name === "Elite" ? "linear-gradient(to right, rgb(253, 224, 71), rgb(251, 146, 60))" :
+                            config.name === "Beautiful" ? "linear-gradient(to right, rgb(232, 121, 249), rgb(168, 85, 247))" :
+                            config.name === "Average" ? "linear-gradient(to right, rgb(34, 211, 238), rgb(59, 130, 246))" :
+                            config.name === "Below Average" ? "linear-gradient(to right, rgb(251, 146, 60), rgb(239, 68, 68))" :
+                            "linear-gradient(to right, rgb(248, 113, 113), rgb(236, 72, 153))"
+                }}
               >
                 {/* Background overlay for better text contrast */}
-                <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                <div className="absolute inset-0 bg-black bg-opacity-10"></div>
                 
                 {/* Content */}
                 <div className="relative z-10 flex flex-col items-center space-y-1 md:space-y-2">
