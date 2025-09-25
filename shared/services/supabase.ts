@@ -13,6 +13,12 @@ export interface EnvironmentProvider {
 // Web environment provider class
 export class WebEnvironmentProvider implements EnvironmentProvider {
   getEnvVar(key: string): string | undefined {
+    // In browser, environment variables are directly on window object for Next.js
+    if (typeof window !== 'undefined' && key.startsWith('NEXT_PUBLIC_')) {
+      // Access Next.js public env vars from window
+      return (window as any)[key] || (process as any)?.env?.[key];
+    }
+    // In Node.js/server-side
     if (typeof process !== 'undefined' && process.env) {
       return process.env[key];
     }

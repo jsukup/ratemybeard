@@ -14,38 +14,38 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
   },
   { 
     name: "Elite", 
-    label: "Elite Feet", 
+    label: "Revered Beards", 
     icon: null, 
     color: "bg-gradient-to-r from-yellow-400 to-amber-500",
-    description: "Top 10% - The absolute finest feet you'll find here"
+    description: "Top 10% - The absolute finest beards you'll find here"
   },
   { 
     name: "Beautiful", 
-    label: "Keen Kicks", 
+    label: "Brisker Whiskers", 
     icon: null, 
     color: "bg-gradient-to-r from-purple-500 to-pink-500",
     description: "Top 11-30% - Genuinely attractive and well-maintained"
   },
   { 
     name: "Average", 
-    label: "Jiggy Piggys", 
+    label: "Tuff Scruff", 
     icon: null, 
     color: "bg-gradient-to-r from-blue-500 to-cyan-500",
-    description: "Middle 31-70% - Probably attracting some perv's attention"
+    description: "Middle 31-70% - Your fake ID probably works"
   },
   { 
     name: "Below Average", 
-    label: "Crows Toes", 
+    label: "Chin Pubes", 
     icon: null, 
     color: "bg-gradient-to-r from-orange-500 to-red-400",
-    description: "Bottom 71-90% - Are you even human?"
+    description: "Bottom 71-90% - Help society. Shave already!"
   },
   { 
     name: "Needs Work", 
-    label: "Puke", 
+    label: "Prepubescent", 
     icon: null, 
     color: "bg-gradient-to-r from-red-500 to-rose-600",
-    description: "Bottom 10% - Consider amputation"
+    description: "Bottom 10% - Are you a baby?"
   },
 ];
 

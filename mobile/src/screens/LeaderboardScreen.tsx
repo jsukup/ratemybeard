@@ -121,7 +121,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
         preloadImages(allImages, 0);
       }
     } catch (error) {
-      console.error(`Failed to load ${categoryData[categoryIndex].name} images:`, error);
+      console.error('Failed to load ' + categoryData[categoryIndex].name + ' images:', error);
       setCategories(prev => prev.map((cat, idx) => 
         idx === categoryIndex 
           ? { ...cat, loading: false }

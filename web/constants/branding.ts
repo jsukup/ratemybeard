@@ -15,17 +15,17 @@ export const BRAND_CONFIG = {
     // Logo variations with web-specific paths
     logo: {
       ...SHARED_BRAND_CONFIG.assets.logo,
-      main: '/images/ratemyfeet-logo.png',
-      light: '/images/ratemyfeet-logo-light.png',
-      dark: '/images/ratemyfeet-logo.png',
-      icon: '/images/ratemyfeet-icon-dark.png',
-      wordmark: '/images/ratemyfeet-logo.png',
+      main: '/images/ratemybeard-logo.png',
+      light: '/images/ratemybeard-logo-light.png',
+      dark: '/images/ratemybeard-logo.png',
+      icon: '/images/ratemybeard-icon-dark.png',
+      wordmark: '/images/ratemybeard-logo.png',
     },
     
     // Favicons with web-specific paths
     favicon: {
       ...SHARED_BRAND_CONFIG.assets.favicon,
-      ico: '/favicon-ratemyfeet.ico',
+      ico: '/favicon-ratemybeard.ico',
       png16: '/favicon-16x16.png',
       png32: '/favicon-32x32.png',
       appleTouchIcon: '/apple-touch-icon.png',

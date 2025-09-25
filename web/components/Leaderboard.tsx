@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, Star, Trophy, Users, TrendingUp, Sparkles, Flag } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AdContainer } from "@/components/AdScriptFixed";
-import { getLeaderboardData } from "@shared/utils/medianCalculation";
+import { getLeaderboardData } from "@/utils/medianCalculation";
 import { getRatingColor, getRatingBgColor } from "@/lib/utils";
 import { InlineRatingSlider } from "@/components/InlineRatingSlider";
 import { getOrCreateSessionId } from "@/lib/session";
@@ -58,10 +58,10 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
   },
   { 
     name: "Elite", 
-    label: "Elite Feet", 
+    label: "Elite Beards", 
     icon: null, 
     color: "bg-gradient-to-r from-yellow-400 to-amber-500",
-    description: "Top 10% - The absolute finest feet you'll find here"
+    description: "Top 10% - The absolute finest beards you'll find here"
   },
   { 
     name: "Beautiful", 
@@ -79,7 +79,7 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
   },
   { 
     name: "Below Average", 
-    label: "Crows Toes", 
+    label: "Chin Chaos", 
     icon: null, 
     color: "bg-gradient-to-r from-orange-500 to-red-400",
     description: "Bottom 71-90% - Are you even human?"

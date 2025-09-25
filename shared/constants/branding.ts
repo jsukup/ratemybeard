@@ -1,35 +1,35 @@
 /**
- * RateMyFeet Branding Configuration
+ * RateMyBeard Branding Configuration
  * 
- * This file contains all branding constants and configuration for the RateMyFeet application.
+ * This file contains all branding constants and configuration for the RateMyBeard application.
  * Shared between web and mobile platforms.
  */
 
 export const BRAND_CONFIG = {
   // Brand Identity
-  name: 'RateMyFeet',
-  tagline: 'COMPETE...with YOUR FEET!',
-  shortDescription: 'A lighthearted platform for rating foot attractiveness',
-  longDescription: 'A fun, community-driven platform where users can submit photos and rate foot attractiveness through user-generated scoring',
+  name: 'RateMyBeard',
+  tagline: 'GET WEIRD...with YOUR BEARD!',
+  shortDescription: 'A lighthearted platform for rating beard attractiveness',
+  longDescription: 'A fun, community-driven platform where users can submit photos and rate beard attractiveness through user-generated scoring',
   
   // Contact Information
-  contactEmail: 'info@ratemyfeet.net',
-  supportEmail: 'info@ratemyfeet.net',
+  contactEmail: 'info@ratemybeard.net',
+  supportEmail: 'info@ratemybeard.net',
   
   // Asset Paths - Platform specific paths will be overridden
   assets: {
     // Logo variations
     logo: {
-      main: '/images/ratemyfeet-logo.png',
-      light: '/images/ratemyfeet-logo-light.png',
-      dark: '/images/ratemyfeet-logo.png',
-      icon: '/images/ratemyfeet-icon-dark.png',
-      wordmark: '/images/ratemyfeet-logo.png',
+      main: '/images/ratemybeard-logo.png',
+      light: '/images/ratemybeard-logo-light.png',
+      dark: '/images/ratemybeard-logo.png',
+      icon: '/images/ratemybeard-icon-dark.png',
+      wordmark: '/images/ratemybeard-logo.png',
     },
     
     // Favicons
     favicon: {
-      ico: '/favicon-ratemyfeet.ico',
+      ico: '/favicon-ratemybeard.ico',
       png16: '/favicon-16x16.png',
       png32: '/favicon-32x32.png',
       appleTouchIcon: '/apple-touch-icon.png',
@@ -94,23 +94,25 @@ export const BRAND_CONFIG = {
   
   // Social Media & URLs
   social: {
-    website: 'https://ratemyfeet.com',
-    twitter: '@ratemyfeet',
-    instagram: '@ratemyfeet',
-    github: 'https://github.com/jsukup/ratemyfeet',
+    website: 'https://ratemybeard.net',
+    twitter: '@ratemybeard',
+    instagram: '@ratemybeard',
+    github: 'https://github.com/jsukup/ratemybeard',
   },
   
   // SEO & Meta
   seo: {
     keywords: [
-      'feet rating',
-      'foot attractiveness',
+      'beard rating',
+      'beard attractiveness',
       'community rating',
       'photo rating',
       'user generated content',
       'fun rating app',
-      'feet photos',
-      'attractiveness score'
+      'beard photos',
+      'attractiveness score',
+      'facial hair rating',
+      'beard competition'
     ],
     category: 'Entertainment',
     locale: 'en_US',
@@ -118,7 +120,7 @@ export const BRAND_CONFIG = {
   
   // Legal
   legal: {
-    companyName: 'RateMyFeet',
+    companyName: 'RateMyBeard',
     copyrightYear: new Date().getFullYear(),
     termsUrl: '/terms',
     privacyUrl: '/privacy',

@@ -3,6 +3,12 @@ import { ENV_KEYS } from '../constants/api';
 // Web environment provider class
 export class WebEnvironmentProvider {
     getEnvVar(key) {
+        // In browser, environment variables are directly on window object for Next.js
+        if (typeof window !== 'undefined' && key.startsWith('NEXT_PUBLIC_')) {
+            // Access Next.js public env vars from window
+            return window[key] || process?.env?.[key];
+        }
+        // In Node.js/server-side
         if (typeof process !== 'undefined' && process.env) {
             return process.env[key];
         }

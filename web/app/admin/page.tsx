@@ -64,7 +64,7 @@ interface AdminStats {
 }
 
 const REPORT_REASON_LABELS: Record<string, string> = {
-  'not_feet': 'Not Feet',
+  'not_beard': 'Not Beard',
   'inappropriate': 'Inappropriate Content',
   'spam_fake': 'Spam/Fake',
   'other': 'Other'

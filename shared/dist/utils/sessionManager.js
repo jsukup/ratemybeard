@@ -21,7 +21,7 @@ const defaultWebStorage = {
  */
 export class SessionManager {
     constructor(storage = defaultWebStorage) {
-        this.SESSION_KEY = 'ratemyfeet_session_id';
+        this.SESSION_KEY = 'ratemybeard_session_id';
         this.storage = storage;
     }
     /**

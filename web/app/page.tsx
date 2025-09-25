@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase-client";
 import { AdContainer } from "@/components/AdScriptFixed";
 
 // Dynamically import WebcamCaptureSimple to prevent SSR issues
@@ -324,14 +324,33 @@ function HomeContent() {
           <div className="text-center mb-6">
             <div className="mx-auto mb-4 logo-animation">
               <img 
-                src="/images/ratemyfeet-logo.png" 
-                alt="RateMyFeet Logo" 
+                src="/images/ratemybeard-logo.png" 
+                alt="RateMyBeard Logo" 
                 className="h-20 sm:h-28 md:h-36 lg:h-40 mx-auto"
               />
             </div>
             <p className="text-lg sm:text-xl text-white drop-shadow-lg font-semibold px-4">
-              🦶 COMPETE...<em>with YOUR FEET!</em>! 🦶
+              🧔 GET WEIRD...<em>with YOUR BEARD!</em>! 🧔
             </p>
+            
+            {/* Sister Site Link */}
+            <div className="mt-4 text-center px-4">
+              <p className="text-sm sm:text-base text-white drop-shadow-lg font-medium mb-2">
+                Visit our sister site:
+              </p>
+              <a 
+                href="https://ratemyfeet.net?utm_source=ratemybeard"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block hover:scale-105 transition-transform duration-200"
+              >
+                <img 
+                  src="/images/ratemyfeet-logo.png" 
+                  alt="RateMyFeet Logo" 
+                  className="h-6 sm:h-8 md:h-10 mx-auto drop-shadow-lg hover:drop-shadow-xl transition-all duration-200"
+                />
+              </a>
+            </div>
           </div>
 
           {/* Main Content */}
@@ -373,9 +392,9 @@ function HomeContent() {
                     )}
                     
                     <div className="text-center mb-6">
-                      <h2 className="text-2xl font-bold mb-2">Show us Those Toes!</h2>
+                      <h2 className="text-2xl font-bold mb-2">Show us That Beard!</h2>
                       <p className="text-muted-foreground">
-                        Position your feet in the frame and click the Take Photo button
+                        Position your beard in the frame and click the Take Photo button
                       </p>
                     </div>
                     
@@ -453,7 +472,7 @@ function HomeContent() {
                   className="mt-0.5"
                 />
                 <Label htmlFor="terms" className="text-sm leading-relaxed" id="terms-description">
-                  I have read and agree to the <a href="/privacy" target="_blank" className="text-primary hover:underline">Privacy Policy</a> and <a href="/image-policy" target="_blank" className="text-primary hover:underline">Image Policy</a>. I understand submitted images become property of RateMyFeet and will only be deleted if they violate the Image Policy. I confirm I am 18+ years old and will safeguard my username to check ratings later.
+                  I have read and agree to the <a href="/privacy" target="_blank" className="text-primary hover:underline">Privacy Policy</a> and <a href="/image-policy" target="_blank" className="text-primary hover:underline">Image Policy</a>. I understand submitted images become property of RateMyBeard and will only be deleted if they violate the Image Policy. I confirm I am 18+ years old and will safeguard my username to check ratings later.
                 </Label>
               </div>
               
@@ -483,7 +502,7 @@ function HomeContent() {
                 Image Policy
               </a>
             </div>
-            <p className="text-sm text-gray-400">&copy; 2025 RateMyFeet. All Rights Reserved</p>
+            <p className="text-sm text-gray-400">&copy; 2025 RateMyBeard. All Rights Reserved</p>
           </div>
         </div>
       </footer>

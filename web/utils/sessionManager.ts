@@ -1,5 +1,5 @@
 import { SessionManager, type StorageInterface } from '@shared/utils/sessionManager';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase-client';
 
 // Create a web-specific storage implementation for localStorage
 class WebStorage implements StorageInterface {

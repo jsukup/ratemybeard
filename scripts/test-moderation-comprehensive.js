@@ -5,7 +5,7 @@
  * daily digest notifications, and permanent deletion functionality.
  */
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ratemyfeet2025';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ratemybeard2025';
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
 
 // Test utilities
@@ -29,11 +29,11 @@ async function testBasicReportSubmission() {
   
   const testCases = [
     {
-      name: 'Valid report - not_feet',
+      name: 'Valid report - not_beard',
       data: {
         imageId: generateTestImageId(),
-        reportReason: 'not_feet',
-        reportDetails: 'This is clearly not a foot image'
+        reportReason: 'not_beard',
+        reportDetails: 'This is clearly not a beard image'
       },
       expectedStatus: 201
     },

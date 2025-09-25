@@ -1,11 +1,11 @@
-# RateMyFeet - Full-Stack Monorepo
+# RateMyBeard - Full-Stack Monorepo
 
-A complete monorepo implementation of RateMyFeet with web and mobile applications sharing business logic through a common package.
+A complete monorepo implementation of RateMyBeard with web and mobile applications sharing business logic through a common package.
 
 ## 🏗️ Architecture
 
 ```
-ratemyfeet/
+ratemybeard/
 ├── web/                    # Next.js web application
 ├── mobile/                 # React Native + Expo mobile app  
 ├── shared/                 # Shared business logic and types
@@ -55,8 +55,8 @@ ratemyfeet/
 
 ```bash
 # Clone repository
-git clone https://github.com/jsukup/ratemyfeet.git
-cd ratemyfeet
+git clone https://github.com/jsukup/ratemybeard.git
+cd ratemybeard
 
 # Install all dependencies (installs for all workspaces)
 npm install
@@ -259,7 +259,7 @@ The application uses these main tables:
 ### Web Deployment (Vercel)
 - Automatic deployment on push to main
 - Environment variables configured in Vercel dashboard
-- Custom domain: https://ratemyfeet.net
+- Custom domain: https://ratemybeard.net
 
 ### Mobile Deployment (EAS)
 - Development builds for testing

@@ -13,11 +13,11 @@ export default function ImageDetailScreen({ route, navigation }: Props) {
   // Placeholder data - will integrate with Supabase later
   const imageData = {
     id: imageId,
-    url: 'https://via.placeholder.com/300x300/FF69B4/FFFFFF?text=Foot+Image',
+    url: 'https://via.placeholder.com/300x300/FF69B4/FFFFFF?text=Beard+Image',
     username: 'user123',
     medianScore: 7.8,
     totalRatings: 42,
-    category: 'Elite Feet',
+    category: 'Elite Beards',
     createdAt: '2024-01-15',
   };
 

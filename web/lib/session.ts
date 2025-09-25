@@ -2,7 +2,7 @@
  * Session management utilities for rating system
  */
 
-const SESSION_KEY = 'ratemyfeet_session_id';
+const SESSION_KEY = 'ratemybeard_session_id';
 
 /**
  * Get or create a session ID
@@ -35,8 +35,8 @@ export function getOrCreateSessionId(): string {
   }
   
   // If still no session ID, check for in-memory fallback
-  if (!sessionId && (window as any)._rateMyFeetSession) {
-    sessionId = (window as any)._rateMyFeetSession;
+  if (!sessionId && (window as any)._rateMyBeardSession) {
+    sessionId = (window as any)._rateMyBeardSession;
   }
   
   // Generate new session ID if none exists
@@ -53,7 +53,7 @@ export function getOrCreateSessionId(): string {
       } catch (error2) {
         // If both fail, store in memory as last resort
         console.warn('Both localStorage and sessionStorage blocked, using in-memory session storage');
-        (window as any)._rateMyFeetSession = sessionId;
+        (window as any)._rateMyBeardSession = sessionId;
       }
     }
   }
@@ -70,7 +70,7 @@ export function getOrCreateSessionId(): string {
       try {
         sessionStorage.setItem(SESSION_KEY, sessionId);
       } catch (error2) {
-        (window as any)._rateMyFeetSession = sessionId;
+        (window as any)._rateMyBeardSession = sessionId;
       }
     }
   }
@@ -112,7 +112,7 @@ export function clearSession(): void {
     }
     
     // Clear in-memory storage
-    delete (window as any)._rateMyFeetSession;
+    delete (window as any)._rateMyBeardSession;
   }
 }
 
@@ -142,5 +142,5 @@ export function getCurrentSessionId(): string | null {
   }
   
   // Check in-memory storage
-  return (window as any)._rateMyFeetSession || null;
+  return (window as any)._rateMyBeardSession || null;
 }

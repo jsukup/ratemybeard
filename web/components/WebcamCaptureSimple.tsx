@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Camera } from "lucide-react";
 import Webcam from "react-webcam";
 import { isMobile } from 'react-device-detect';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase-client';
 import UsernameInput from './UsernameInput';
 
 // Utility function to convert data URL to File object
@@ -161,7 +161,7 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
   // Device-specific camera constraints
   const videoConstraints = React.useMemo(() => {
     if (isMobile) {
-      // Mobile: Prefer rear camera for foot photography
+      // Mobile: Prefer rear camera for beard photography
       return {
         width: { ideal: 1280 },
         height: { ideal: 720 },
@@ -280,7 +280,7 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
       {!imgSrc && !showUsernameInput && (
         <div className="flex flex-col items-center w-full max-w-xl mt-2">
           <a 
-            href="mailto:info@ratemyfeet.net" 
+            href="mailto:info@ratemybeard.net" 
             className="mt-2 text-primary hover:text-primary/80 font-medium transition-colors"
           >
             Questions? Suggestions? Contact Us!

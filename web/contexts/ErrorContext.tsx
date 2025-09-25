@@ -64,7 +64,7 @@ export function ErrorProvider({
       ...errorData,
       context: {
         url: typeof window !== 'undefined' ? window.location.href : undefined,
-        sessionId: typeof window !== 'undefined' ? localStorage.getItem('ratemyfeet_session_id') || undefined : undefined,
+        sessionId: typeof window !== 'undefined' ? localStorage.getItem('ratemybeard_session_id') || undefined : undefined,
         ...errorData.context
       }
     };

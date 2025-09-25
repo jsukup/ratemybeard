@@ -26,16 +26,16 @@ interface ReportModalProps {
 }
 
 interface ReportOption {
-  value: 'not_feet' | 'inappropriate' | 'spam_fake' | 'other';
+  value: 'not_beard' | 'inappropriate' | 'spam_fake' | 'other';
   label: string;
   description: string;
 }
 
 const REPORT_OPTIONS: ReportOption[] = [
   {
-    value: 'not_feet',
-    label: 'Not feet',
-    description: 'This image does not show feet'
+    value: 'not_beard',
+    label: 'Not beard',
+    description: 'This image does not show a beard'
   },
   {
     value: 'inappropriate',

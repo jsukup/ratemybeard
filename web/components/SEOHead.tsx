@@ -192,7 +192,7 @@ export function HomePageSEO() {
     <SEOHead
       title={`${BRAND_CONFIG.name} - ${BRAND_CONFIG.tagline}`}
       description={BRAND_CONFIG.longDescription}
-      keywords={['home', 'main page', 'foot rating platform']}
+      keywords={['home', 'main page', 'beard rating platform']}
       url={BRAND_CONFIG.social.website}
     />
   );
@@ -201,9 +201,9 @@ export function HomePageSEO() {
 export function LeaderboardSEO() {
   return (
     <SEOHead
-      title="Leaderboard - Top Rated Feet"
-      description="Browse the top-rated feet on RateMyFeet. See community rankings and discover the highest-rated submissions."
-      keywords={['leaderboard', 'rankings', 'top rated', 'best feet', 'high scores']}
+      title="Leaderboard - Top Rated Beards"
+      description="Browse the top-rated beards on RateMyBeard. See community rankings and discover the highest-rated submissions."
+      keywords={['leaderboard', 'rankings', 'top rated', 'best beards', 'high scores']}
       url={`${BRAND_CONFIG.social.website}/leaderboard`}
     />
   );
@@ -212,8 +212,8 @@ export function LeaderboardSEO() {
 export function AboutSEO() {
   return (
     <SEOHead
-      title="About RateMyFeet"
-      description="Learn about RateMyFeet, a fun community platform for rating foot attractiveness. Discover how our rating system works and join the community."
+      title="About RateMyBeard"
+      description="Learn about RateMyBeard, a fun community platform for rating beard attractiveness. Discover how our rating system works and join the community."
       keywords={['about', 'how it works', 'community', 'rating system']}
       url={`${BRAND_CONFIG.social.website}/about`}
     />
@@ -224,7 +224,7 @@ export function PrivacySEO() {
   return (
     <SEOHead
       title="Privacy Policy"
-      description="Read our privacy policy to understand how we collect, use, and protect your personal information on RateMyFeet."
+      description="Read our privacy policy to understand how we collect, use, and protect your personal information on RateMyBeard."
       keywords={['privacy', 'policy', 'data protection', 'user privacy']}
       url={`${BRAND_CONFIG.social.website}/privacy`}
       noIndex={true}
@@ -236,7 +236,7 @@ export function TermsSEO() {
   return (
     <SEOHead
       title="Terms of Service"
-      description="Read our terms of service to understand the rules and guidelines for using RateMyFeet."
+      description="Read our terms of service to understand the rules and guidelines for using RateMyBeard."
       keywords={['terms', 'service', 'rules', 'guidelines', 'legal']}
       url={`${BRAND_CONFIG.social.website}/terms`}
       noIndex={true}

@@ -6,7 +6,7 @@ const DAILY_REPORT_LIMIT = 10;
 
 interface ReportSubmission {
   imageId: string;
-  reportReason: 'not_feet' | 'inappropriate' | 'spam_fake' | 'other';
+  reportReason: 'not_beard' | 'inappropriate' | 'spam_fake' | 'other';
   reportDetails?: string;
 }
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validation: Check report reason
-    const validReasons = ['not_feet', 'inappropriate', 'spam_fake', 'other'];
+    const validReasons = ['not_beard', 'inappropriate', 'spam_fake', 'other'];
     if (!validReasons.includes(reportReason)) {
       return NextResponse.json(
         { error: 'Invalid report reason. Must be one of: ' + validReasons.join(', ') },

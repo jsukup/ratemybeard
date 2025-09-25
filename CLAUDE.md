@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-RateMyFeet is a Next.js application being transformed from an AI-powered facial attractiveness analyzer to a user-driven rating platform for foot images. The application features:
+RateMyBeard is a Next.js application being transformed from an AI-powered facial attractiveness analyzer to a user-driven rating platform for beard images. The application features:
 
 - **Frontend**: Next.js with TypeScript, Tailwind CSS, and Radix UI components
 - **Backend**: Next.js API routes for user rating system
@@ -65,10 +65,10 @@ The application is being transformed to include:
 3. **Rate Limiting**: IP-based daily limits (50 ratings/day)
 4. **Leaderboard Categories**: Ranked tiers ("Smoke Shows", "Monets", "Mehs", "Plebs", "Dregs")
 5. **Performance Optimization**: Lazy loading and image caching
-6. **Branding Update**: Complete rebrand from "looxmaxx" to "RateMyFeet"
+6. **Branding Update**: Complete rebrand from "looxmaxx" to "RateMyBeard"
 
 ### Data Flow (New System)
-1. User captures foot image via webcam
+1. User captures beard image via webcam
 2. Username validation and image upload to Supabase
 3. Other users rate images on 0-10 scale
 4. Median scores calculated and leaderboard updated
@@ -119,12 +119,12 @@ When working on tasks across multiple worktrees, follow this workflow:
 8. **Move to next priority task**
 
 #### Worktree Status
-- ✅ **ratemyfeet-cleanup** (Task 1) - **COMPLETED & PUSHED**
-- ✅ **ratemyfeet-database** (Task 2) - **COMPLETED & PUSHED** 
-- ⬜ **ratemyfeet-rating** (Tasks 3-6) - Ready to start (depends on Task 2)
-- ⬜ **ratemyfeet-users** (Tasks 7-10) - Depends on Tasks 3-6
-- ⬜ **ratemyfeet-branding** (Task 11) - Can run in parallel
-- ⬜ **ratemyfeet-errors** (Task 12) - Final integration work
+- ✅ **ratemybeard-cleanup** (Task 1) - **COMPLETED & PUSHED**
+- ✅ **ratemybeard-database** (Task 2) - **COMPLETED & PUSHED** 
+- ⬜ **ratemybeard-rating** (Tasks 3-6) - Ready to start (depends on Task 2)
+- ⬜ **ratemybeard-users** (Tasks 7-10) - Depends on Tasks 3-6
+- ⬜ **ratemybeard-branding** (Task 11) - Can run in parallel
+- ⬜ **ratemybeard-errors** (Task 12) - Final integration work
 
 ### TaskMaster Implementation Plan
 The codebase is being updated through Claude TaskMaster with 12 main tasks:
@@ -138,7 +138,7 @@ The codebase is being updated through Claude TaskMaster with 12 main tasks:
 8. Update image capture workflow
 9. Implement session management
 10. Add performance optimizations
-11. Complete branding update to RateMyFeet
+11. Complete branding update to RateMyBeard
 12. Add comprehensive error handling
 
 ### Current Development Status

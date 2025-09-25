@@ -46,7 +46,7 @@ export const PAGINATION = {
 export const SESSION_CONFIG = {
   SESSION_ID_PREFIX: 'session_',
   TEMP_SESSION_ID_PREFIX: 'temp_session_',
-  SESSION_STORAGE_KEY: 'ratemyfeet_session_id',
+  SESSION_STORAGE_KEY: 'ratemybeard_session_id',
   SESSION_LIFETIME: 365 * 24 * 60 * 60 * 1000, // 1 year in milliseconds
 } as const;
 

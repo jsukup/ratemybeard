@@ -7,21 +7,21 @@
   --background-start-rgb: 10, 10, 20;
   --background-end-rgb: 0, 0, 0;
   
-  /* RateMyFeet brand color palette */
-  --brand-pink: 255, 20, 147;
-  --brand-purple: 138, 43, 226;
-  --brand-blue: 30, 144, 255;
-  --brand-cyan: 0, 255, 255;
-  --brand-green: 0, 255, 127;
-  --brand-yellow: 255, 215, 0;
-  --brand-orange: 255, 140, 0;
-  --brand-red: 255, 69, 0;
+  /* RateMyBeard brand color palette */
+  --brand-amber: 212, 165, 116;
+  --brand-brown: 139, 69, 19;
+  --brand-forest: 47, 79, 47;
+  --brand-gold: 218, 165, 32;
+  --brand-copper: 184, 115, 51;
+  --brand-chestnut: 205, 92, 92;
+  --brand-bronze: 205, 127, 50;
+  --brand-mahogany: 192, 64, 0;
   
   /* Status colors for consistent feedback */
-  --success: var(--brand-green);
-  --warning: var(--brand-yellow);
-  --error: var(--brand-red);
-  --info: var(--brand-blue);
+  --success: var(--brand-forest);
+  --warning: var(--brand-gold);
+  --error: var(--brand-chestnut);
+  --info: var(--brand-amber);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -169,23 +169,23 @@
   0% {
     transform: scale(1);
     opacity: 0.85;
-    filter: drop-shadow(0 0 10px rgba(var(--brand-purple), 0.4))
-            drop-shadow(0 0 20px rgba(var(--brand-pink), 0.3))
-            drop-shadow(0 0 30px rgba(var(--brand-blue), 0.2));
+    filter: drop-shadow(0 0 10px rgba(var(--brand-brown), 0.4))
+            drop-shadow(0 0 20px rgba(var(--brand-amber), 0.3))
+            drop-shadow(0 0 30px rgba(var(--brand-gold), 0.2));
   }
   50% {
     transform: scale(1.08);
     opacity: 1;
-    filter: drop-shadow(0 0 20px rgba(var(--brand-purple), 0.8))
-            drop-shadow(0 0 40px rgba(var(--brand-pink), 0.6))
-            drop-shadow(0 0 60px rgba(var(--brand-blue), 0.4));
+    filter: drop-shadow(0 0 20px rgba(var(--brand-brown), 0.8))
+            drop-shadow(0 0 40px rgba(var(--brand-amber), 0.6))
+            drop-shadow(0 0 60px rgba(var(--brand-gold), 0.4));
   }
   100% {
     transform: scale(1);
     opacity: 0.85;
-    filter: drop-shadow(0 0 10px rgba(var(--brand-purple), 0.4))
-            drop-shadow(0 0 20px rgba(var(--brand-pink), 0.3))
-            drop-shadow(0 0 30px rgba(var(--brand-blue), 0.2));
+    filter: drop-shadow(0 0 10px rgba(var(--brand-brown), 0.4))
+            drop-shadow(0 0 20px rgba(var(--brand-amber), 0.3))
+            drop-shadow(0 0 30px rgba(var(--brand-gold), 0.2));
   }
 }
 
@@ -204,9 +204,9 @@
   right: -20px;
   bottom: -20px;
   background: radial-gradient(circle, 
-    rgba(var(--brand-purple), 0.15) 0%, 
-    rgba(var(--brand-pink), 0.1) 30%, 
-    rgba(var(--brand-blue), 0.05) 60%, 
+    rgba(var(--brand-brown), 0.15) 0%, 
+    rgba(var(--brand-amber), 0.1) 30%, 
+    rgba(var(--brand-gold), 0.05) 60%, 
     transparent 100%);
   border-radius: 50%;
   animation: glow-background 3s ease-in-out infinite;
@@ -246,17 +246,17 @@
   }
 }
 
-/* Brighter colorful background with better contrast */
+/* Rich beard-inspired background with warm tones */
 .colorful-bg {
   background: linear-gradient(135deg, 
-                rgba(70, 40, 120, 0.85) 0%, 
-                rgba(90, 50, 160, 0.85) 25%, 
-                rgba(60, 80, 140, 0.85) 50%, 
-                rgba(130, 70, 180, 0.85) 75%, 
-                rgba(100, 60, 170, 0.85) 100%),
-              radial-gradient(circle at 15% 15%, rgba(255, 130, 200, 0.6) 0%, transparent 60%),
-              radial-gradient(circle at 85% 85%, rgba(120, 170, 255, 0.6) 0%, transparent 60%),
-              radial-gradient(circle at 50% 50%, rgba(170, 140, 240, 0.5) 0%, transparent 80%);
+                rgba(139, 69, 19, 0.85) 0%, 
+                rgba(184, 115, 51, 0.85) 25%, 
+                rgba(212, 165, 116, 0.85) 50%, 
+                rgba(205, 127, 50, 0.85) 75%, 
+                rgba(47, 79, 47, 0.85) 100%),
+              radial-gradient(circle at 15% 15%, rgba(218, 165, 32, 0.6) 0%, transparent 60%),
+              radial-gradient(circle at 85% 85%, rgba(205, 92, 92, 0.6) 0%, transparent 60%),
+              radial-gradient(circle at 50% 50%, rgba(192, 64, 0, 0.5) 0%, transparent 80%);
   background-attachment: fixed;
   position: relative;
   overflow-x: hidden;
@@ -360,12 +360,12 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(150, 100, 220, 0.8);
+  background: rgba(184, 115, 51, 0.8);
   border-radius: 5px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(150, 100, 220, 1);
+  background: rgba(184, 115, 51, 1);
 }
 
 /* Firework animation */

@@ -1,7 +1,7 @@
 {
-  "name": "ratemyfeet-workspace",
+  "name": "ratemybeard-workspace",
   "version": "2.0.0",
-  "description": "RateMyFeet monorepo workspace containing web and mobile applications",
+  "description": "RateMyBeard monorepo workspace containing web and mobile applications",
   "private": true,
   "workspaces": [
     "web",
@@ -59,22 +59,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jsukup/ratemyfeet.git"
+    "url": "https://github.com/jsukup/ratemybeard.git"
   },
   "keywords": [
-    "ratemyfeet",
+    "ratemybeard",
     "rating",
     "mobile",
     "web",
     "supabase",
     "nextjs",
     "react-native",
-    "expo"
+    "expo",
+    "beard",
+    "facial-hair"
   ],
-  "author": "RateMyFeet Team",
+  "author": "RateMyBeard Team",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jsukup/ratemyfeet/issues"
+    "url": "https://github.com/jsukup/ratemybeard/issues"
   },
-  "homepage": "https://ratemyfeet.net"
+  "homepage": "https://ratemybeard.net"
 }

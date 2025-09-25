@@ -28,7 +28,7 @@ const defaultWebStorage: StorageInterface = {
  */
 export class SessionManager {
   private storage: StorageInterface;
-  private readonly SESSION_KEY = 'ratemyfeet_session_id';
+  private readonly SESSION_KEY = 'ratemybeard_session_id';
 
   constructor(storage: StorageInterface = defaultWebStorage) {
     this.storage = storage;

@@ -5,8 +5,8 @@ export default function ImagePolicy() {
     <main className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="text-center mb-8">
         <img 
-          src="/images/ratemyfeet-logo.png" 
-          alt="RateMyFeet Logo" 
+          src="/images/ratemybeard-logo.png" 
+          alt="RateMyBeard Logo" 
           className="h-16 mx-auto mb-4"
         />
         <h1 className="text-3xl font-bold text-white">Image Policy</h1>
@@ -17,7 +17,7 @@ export default function ImagePolicy() {
         <section>
           <h2 className="text-2xl font-semibold mb-4">1. Purpose and Scope</h2>
           <p className="text-muted-foreground leading-relaxed">
-            This Image Policy governs all visual content submitted to RateMyFeet. Our platform is specifically designed for rating the aesthetic appeal of feet, and all submissions must comply with these guidelines to maintain a respectful and appropriate community environment.
+            This Image Policy governs all visual content submitted to RateMyBeard. Our platform is specifically designed for rating the aesthetic appeal of beards, and all submissions must comply with these guidelines to maintain a respectful and appropriate community environment.
           </p>
         </section>
 
@@ -29,11 +29,11 @@ export default function ImagePolicy() {
                 ✓ Images that ARE allowed:
               </p>
               <ul className="list-disc pl-6 text-green-700 dark:text-green-300 space-y-1">
-                <li>Clear, well-lit photos of feet as the primary subject</li>
-                <li>Feet in natural, non-suggestive poses</li>
-                <li>Clean, well-groomed feet without injuries or medical conditions</li>
-                <li>Feet wearing socks, shoes, or other non-revealing footwear</li>
-                <li>Artistic or aesthetic photography focusing on feet</li>
+                <li>Clear, well-lit photos of beards as the primary subject</li>
+                <li>Beards in natural, non-suggestive poses</li>
+                <li>Clean, well-groomed beards without skin conditions</li>
+                <li>Styled beards with appropriate grooming accessories</li>
+                <li>Artistic or aesthetic photography focusing on beards</li>
                 <li>Photos taken in appropriate, non-intimate settings</li>
               </ul>
             </div>
@@ -62,11 +62,11 @@ export default function ImagePolicy() {
               </p>
               <ul className="list-disc pl-6 text-red-700 dark:text-red-300 space-y-1">
                 <li>Images containing genitalia, nudity, or sexual content</li>
-                <li>Feet involved in sexual, vulgar, or inappropriate conduct</li>
+                <li>Beards involved in sexual, vulgar, or inappropriate conduct</li>
                 <li>Images with fetishistic or explicitly sexual elements</li>
                 <li>Photos taken in bathrooms, bedrooms, or intimate settings</li>
-                <li>Images showing feet in contact with inappropriate objects</li>
-                <li>Content that sexualizes or objectifies feet in inappropriate ways</li>
+                <li>Images showing beards in contact with inappropriate objects</li>
+                <li>Content that sexualizes or objectifies beards in inappropriate ways</li>
               </ul>
             </div>
             
@@ -76,7 +76,7 @@ export default function ImagePolicy() {
                 The following content is also prohibited:
               </p>
               <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-                <li><strong>Non-Feet Content:</strong> Images where feet are not the primary subject</li>
+                <li><strong>Non-Beard Content:</strong> Images where beards are not the primary subject</li>
                 <li><strong>Medical Content:</strong> Images showing injuries, infections, or medical conditions</li>
                 <li><strong>Illegal Activity:</strong> Images depicting illegal substances, activities, or content</li>
                 <li><strong>Copyrighted Material:</strong> Images you do not own or have rights to use</li>
@@ -149,7 +149,7 @@ export default function ImagePolicy() {
           <h2 className="text-2xl font-semibold mb-4">6. User Responsibilities</h2>
           <div className="space-y-4">
             <p className="text-muted-foreground leading-relaxed">
-              By submitting images to RateMyFeet, you agree to:
+              By submitting images to RateMyBeard, you agree to:
             </p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-1">
               <li>Ensure all content complies with this Image Policy</li>
@@ -166,11 +166,11 @@ export default function ImagePolicy() {
           <h2 className="text-2xl font-semibold mb-4">7. Community Standards</h2>
           <div className="space-y-4">
             <p className="text-muted-foreground leading-relaxed">
-              RateMyFeet strives to maintain a respectful, appropriate, and welcoming community. Our standards include:
+              RateMyBeard strives to maintain a respectful, appropriate, and welcoming community. Our standards include:
             </p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-1">
               <li><strong>Respectful Environment:</strong> Content should contribute to a positive community atmosphere</li>
-              <li><strong>Appropriate Focus:</strong> All content must maintain focus on aesthetic appreciation of feet</li>
+              <li><strong>Appropriate Focus:</strong> All content must maintain focus on aesthetic appreciation of beards</li>
               <li><strong>Legal Compliance:</strong> All content must comply with applicable laws and regulations</li>
               <li><strong>Ethical Standards:</strong> Content should not exploit, objectify, or demean individuals</li>
             </ul>
@@ -190,7 +190,7 @@ export default function ImagePolicy() {
             <div>
               <h3 className="text-lg font-medium mb-2">8.2 Right to Use</h3>
               <p className="text-muted-foreground leading-relaxed">
-                By submitting images, you grant RateMyFeet unlimited rights to use, display, modify, and distribute the content. This transfer of rights is permanent and irrevocable.
+                By submitting images, you grant RateMyBeard unlimited rights to use, display, modify, and distribute the content. This transfer of rights is permanent and irrevocable.
               </p>
             </div>
           </div>
@@ -227,7 +227,7 @@ export default function ImagePolicy() {
           href="/" 
           className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
         >
-          ← Back to RateMyFeet
+          ← Back to RateMyBeard
         </a>
       </div>
     </main>

@@ -1,7 +1,7 @@
 {
-  "name": "@ratemyfeet/shared",
+  "name": "@ratemybeard/shared",
   "version": "1.0.0",
-  "description": "Shared types, utilities, and constants for RateMyFeet web and mobile apps",
+  "description": "Shared types, utilities, and constants for RateMyBeard web and mobile apps",
   "main": "index.js",
   "types": "index.d.ts",
   "private": true,

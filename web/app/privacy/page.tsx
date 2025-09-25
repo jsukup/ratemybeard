@@ -5,8 +5,8 @@ export default function PrivacyPolicy() {
     <main className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="text-center mb-8">
         <img 
-          src="/images/ratemyfeet-logo.png" 
-          alt="RateMyFeet Logo" 
+          src="/images/ratemybeard-logo.png" 
+          alt="RateMyBeard Logo" 
           className="h-16 mx-auto mb-4"
         />
         <h1 className="text-3xl font-bold text-white">Privacy Policy</h1>
@@ -17,7 +17,7 @@ export default function PrivacyPolicy() {
         <section>
           <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Welcome to RateMyFeet ("we," "our," or "us"). This Privacy Policy explains how we collect, use, and protect your information when you use our anonymous image rating platform. By using RateMyFeet, you agree to the terms outlined in this policy.
+            Welcome to RateMyBeard ("we," "our," or "us"). This Privacy Policy explains how we collect, use, and protect your information when you use our anonymous image rating platform. By using RateMyBeard, you agree to the terms outlined in this policy.
           </p>
         </section>
 
@@ -46,7 +46,7 @@ export default function PrivacyPolicy() {
         <section>
           <h2 className="text-2xl font-semibold mb-4">3. Anonymous Operations</h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            RateMyFeet operates as an anonymous platform. We do not require or collect:
+            RateMyBeard operates as an anonymous platform. We do not require or collect:
           </p>
           <ul className="list-disc pl-6 text-muted-foreground space-y-1">
             <li>Real names or personal identification</li>
@@ -63,16 +63,16 @@ export default function PrivacyPolicy() {
           <h2 className="text-2xl font-semibold mb-4">4. Image Ownership and Rights</h2>
           <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-4">
             <p className="font-semibold text-amber-800 dark:text-amber-200">
-              By uploading images to RateMyFeet, you transfer full ownership of those images to RateMyFeet.
+              By uploading images to RateMyBeard, you transfer full ownership of those images to RateMyBeard.
             </p>
           </div>
           <div className="space-y-4">
             <div>
               <h3 className="text-lg font-medium mb-2">4.1 Rights Transfer</h3>
               <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-                <li>Images become the exclusive property of RateMyFeet upon submission</li>
+                <li>Images become the exclusive property of RateMyBeard upon submission</li>
                 <li>You waive all copyright, moral rights, and other intellectual property claims</li>
-                <li>RateMyFeet gains unlimited rights to use, modify, distribute, and display images</li>
+                <li>RateMyBeard gains unlimited rights to use, modify, distribute, and display images</li>
                 <li>You cannot request removal of images for personal reasons after submission</li>
               </ul>
             </div>
@@ -89,13 +89,13 @@ export default function PrivacyPolicy() {
           <h2 className="text-2xl font-semibold mb-4">5. Image Deletion Policy</h2>
           <div className="space-y-4">
             <p className="text-muted-foreground leading-relaxed">
-              Images submitted to RateMyFeet will only be deleted if they violate our Image Policy. We do not delete images for personal requests, change of mind, or other non-violation reasons.
+              Images submitted to RateMyBeard will only be deleted if they violate our Image Policy. We do not delete images for personal requests, change of mind, or other non-violation reasons.
             </p>
             <div>
               <h3 className="text-lg font-medium mb-2">5.1 Violation-Based Deletion</h3>
               <p className="text-muted-foreground leading-relaxed mb-2">Images will be flagged and deleted if they:</p>
               <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-                <li>Do not contain feet as the primary subject</li>
+                <li>Do not contain beards as the primary subject</li>
                 <li>Include inappropriate, vulgar, or sexual content</li>
                 <li>Violate community standards or applicable laws</li>
                 <li>Contain copyrighted material or infringe on others' rights</li>
@@ -166,21 +166,21 @@ export default function PrivacyPolicy() {
         <section>
           <h2 className="text-2xl font-semibold mb-4">9. Age Requirements</h2>
           <p className="text-muted-foreground leading-relaxed">
-            RateMyFeet is intended for users 18 years of age and older. By using our platform, you confirm that you are at least 18 years old. We do not knowingly collect information from minors and will delete accounts if we discover underage usage.
+            RateMyBeard is intended for users 18 years of age and older. By using our platform, you confirm that you are at least 18 years old. We do not knowingly collect information from minors and will delete accounts if we discover underage usage.
           </p>
         </section>
 
         <section>
           <h2 className="text-2xl font-semibold mb-4">10. International Users and Data Transfers</h2>
           <p className="text-muted-foreground leading-relaxed">
-            RateMyFeet operates globally and may transfer, store, and process data in countries other than your residence. By using our service, you consent to such transfers. We comply with applicable data protection laws including GDPR for EU users and CCPA for California residents.
+            RateMyBeard operates globally and may transfer, store, and process data in countries other than your residence. By using our service, you consent to such transfers. We comply with applicable data protection laws including GDPR for EU users and CCPA for California residents.
           </p>
         </section>
 
         <section>
           <h2 className="text-2xl font-semibold mb-4">11. Changes to This Policy</h2>
           <p className="text-muted-foreground leading-relaxed">
-            We may update this Privacy Policy periodically. Changes will be posted on this page with an updated effective date. Continued use of RateMyFeet after changes constitutes acceptance of the updated policy.
+            We may update this Privacy Policy periodically. Changes will be posted on this page with an updated effective date. Continued use of RateMyBeard after changes constitutes acceptance of the updated policy.
           </p>
         </section>
 
@@ -195,7 +195,7 @@ export default function PrivacyPolicy() {
           <p className="text-sm text-muted-foreground">
             <strong>Last Updated:</strong> January 1, 2025<br/>
             <strong>Effective Date:</strong> January 1, 2025<br/>
-            By using RateMyFeet, you acknowledge that you have read, understood, and agree to be bound by this Privacy Policy.
+            By using RateMyBeard, you acknowledge that you have read, understood, and agree to be bound by this Privacy Policy.
           </p>
         </section>
       </Card>
@@ -205,7 +205,7 @@ export default function PrivacyPolicy() {
           href="/" 
           className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
         >
-          ← Back to RateMyFeet
+          ← Back to RateMyBeard
         </a>
       </div>
     </main>

@@ -1,4 +1,4 @@
-# RateMyFeet Rating System Test Suite
+# RateMyBeard Rating System Test Suite
 
 A comprehensive testing framework for validating the rating system functionality, database consistency, and performance under various conditions.
 
@@ -16,7 +16,7 @@ The test suite consists of multiple specialized testing components that validate
 
 ### Prerequisites
 
-- Node.js environment with access to the RateMyFeet codebase
+- Node.js environment with access to the RateMyBeard codebase
 - Supabase environment variables configured:
   ```bash
   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -200,7 +200,7 @@ The test suite generates comprehensive JSON reports including:
 - Environment information
 - Execution timestamps and duration
 
-Reports are saved to: `/root/ratemyfeet/test-reports/rating-suite-{timestamp}.json`
+Reports are saved to: `/root/ratemybeard/test-reports/rating-suite-{timestamp}.json`
 
 ## Safety Features
 

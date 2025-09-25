@@ -10,8 +10,8 @@ export default function HomeScreen({ navigation }: Props) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.header}>
-        <Text style={styles.title}>Welcome to RateMyFeet</Text>
-        <Text style={styles.subtitle}>Share and rate foot images with the community</Text>
+        <Text style={styles.title}>Welcome to RateMyBeard</Text>
+        <Text style={styles.subtitle}>Share and rate beard images with the community</Text>
       </View>
       
       <View style={styles.actionsContainer}>
@@ -21,7 +21,7 @@ export default function HomeScreen({ navigation }: Props) {
         >
           <Text style={styles.buttonIcon}>📷</Text>
           <Text style={[styles.buttonText, styles.primaryButtonText]}>Capture Image</Text>
-          <Text style={[styles.buttonSubtext, styles.primaryButtonText]}>Share your feet</Text>
+          <Text style={[styles.buttonSubtext, styles.primaryButtonText]}>Share your beard</Text>
         </TouchableOpacity>
         
         <TouchableOpacity 
@@ -36,7 +36,7 @@ export default function HomeScreen({ navigation }: Props) {
 
       <View style={styles.infoContainer}>
         <Text style={styles.infoTitle}>How it works:</Text>
-        <Text style={styles.infoText}>1. Take a photo of your feet</Text>
+        <Text style={styles.infoText}>1. Take a photo of your beard</Text>
         <Text style={styles.infoText}>2. Community rates your image (0-10)</Text>
         <Text style={styles.infoText}>3. See your ranking on the leaderboard</Text>
         <Text style={styles.infoText}>4. Rate others to earn points</Text>

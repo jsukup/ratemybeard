@@ -5,7 +5,7 @@
  * and provides examples of API usage.
  */
 
-const ADMIN_PASSWORD = 'ratemyfeet2025'; // Default admin password
+const ADMIN_PASSWORD = 'ratemybeard2025'; // Default admin password
 const API_BASE_URL = 'http://localhost:3000';
 
 /**

@@ -1,26 +1,26 @@
 /**
- * RateMyFeet Branding Configuration
+ * RateMyBeard Branding Configuration
  *
- * This file contains all branding constants and configuration for the RateMyFeet application.
+ * This file contains all branding constants and configuration for the RateMyBeard application.
  * Shared between web and mobile platforms.
  */
 export declare const BRAND_CONFIG: {
-    readonly name: "RateMyFeet";
-    readonly tagline: "COMPETE...with YOUR FEET!";
-    readonly shortDescription: "A lighthearted platform for rating foot attractiveness";
-    readonly longDescription: "A fun, community-driven platform where users can submit photos and rate foot attractiveness through user-generated scoring";
-    readonly contactEmail: "info@ratemyfeet.net";
-    readonly supportEmail: "info@ratemyfeet.net";
+    readonly name: "RateMyBeard";
+    readonly tagline: "GET WEIRD...with YOUR BEARD!";
+    readonly shortDescription: "A lighthearted platform for rating beard attractiveness";
+    readonly longDescription: "A fun, community-driven platform where users can submit photos and rate beard attractiveness through user-generated scoring";
+    readonly contactEmail: "info@ratemybeard.net";
+    readonly supportEmail: "info@ratemybeard.net";
     readonly assets: {
         readonly logo: {
-            readonly main: "/images/ratemyfeet-logo.png";
-            readonly light: "/images/ratemyfeet-logo-light.png";
-            readonly dark: "/images/ratemyfeet-logo.png";
-            readonly icon: "/images/ratemyfeet-icon-dark.png";
-            readonly wordmark: "/images/ratemyfeet-logo.png";
+            readonly main: "/images/ratemybeard-logo.png";
+            readonly light: "/images/ratemybeard-logo-light.png";
+            readonly dark: "/images/ratemybeard-logo.png";
+            readonly icon: "/images/ratemybeard-icon-dark.png";
+            readonly wordmark: "/images/ratemybeard-logo.png";
         };
         readonly favicon: {
-            readonly ico: "/favicon-ratemyfeet.ico";
+            readonly ico: "/favicon-ratemybeard.ico";
             readonly png16: "/favicon-16x16.png";
             readonly png32: "/favicon-32x32.png";
             readonly appleTouchIcon: "/apple-touch-icon.png";
@@ -69,18 +69,18 @@ export declare const BRAND_CONFIG: {
         readonly mono: "JetBrains Mono, \"Fira Code\", \"Courier New\", monospace";
     };
     readonly social: {
-        readonly website: "https://ratemyfeet.com";
-        readonly twitter: "@ratemyfeet";
-        readonly instagram: "@ratemyfeet";
-        readonly github: "https://github.com/jsukup/ratemyfeet";
+        readonly website: "https://ratemybeard.net";
+        readonly twitter: "@ratemybeard";
+        readonly instagram: "@ratemybeard";
+        readonly github: "https://github.com/jsukup/ratemybeard";
     };
     readonly seo: {
-        readonly keywords: readonly ["feet rating", "foot attractiveness", "community rating", "photo rating", "user generated content", "fun rating app", "feet photos", "attractiveness score"];
+        readonly keywords: readonly ["beard rating", "beard attractiveness", "community rating", "photo rating", "user generated content", "fun rating app", "beard photos", "attractiveness score", "facial hair rating", "beard competition"];
         readonly category: "Entertainment";
         readonly locale: "en_US";
     };
     readonly legal: {
-        readonly companyName: "RateMyFeet";
+        readonly companyName: "RateMyBeard";
         readonly copyrightYear: number;
         readonly termsUrl: "/terms";
         readonly privacyUrl: "/privacy";
@@ -103,13 +103,13 @@ export declare function generateMetaTags(page?: {
     'og:image': string;
     'og:url': string;
     'og:type': string;
-    'og:site_name': "RateMyFeet";
+    'og:site_name': "RateMyBeard";
     'og:locale': "en_US";
     'twitter:card': string;
     'twitter:title': string;
     'twitter:description': string;
     'twitter:image': string;
-    'twitter:site': "@ratemyfeet";
+    'twitter:site': "@ratemybeard";
     'theme-color': "#FF6B6B";
     'msapplication-TileColor': "#FF6B6B";
 };

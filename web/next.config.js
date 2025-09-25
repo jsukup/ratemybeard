@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ['@ratemybeard/shared'],
   // Remove static export as we're using API routes and server components
   // output: 'export',
   eslint: {

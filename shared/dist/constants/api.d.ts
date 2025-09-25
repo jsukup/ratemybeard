@@ -34,7 +34,7 @@ export declare const PAGINATION: {
 export declare const SESSION_CONFIG: {
     readonly SESSION_ID_PREFIX: "session_";
     readonly TEMP_SESSION_ID_PREFIX: "temp_session_";
-    readonly SESSION_STORAGE_KEY: "ratemyfeet_session_id";
+    readonly SESSION_STORAGE_KEY: "ratemybeard_session_id";
     readonly SESSION_LIFETIME: number;
 };
 export declare const ENV_KEYS: {

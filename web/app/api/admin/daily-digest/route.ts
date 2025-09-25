@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
 // Simple password check for admin access
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ratemyfeet2025';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ratemybeard2025';
 
 interface DigestStats {
   flaggedImages: number;
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'User-Agent': 'RateMyFeet-DailyDigest/1.0'
+            'User-Agent': 'RateMyBeard-DailyDigest/1.0'
           },
           body: JSON.stringify(webhookPayload)
         });

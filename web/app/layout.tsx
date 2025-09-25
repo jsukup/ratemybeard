@@ -11,10 +11,10 @@ const inter = Inter({ subsets: ['latin'] });
 const TEST_ADS = false;
 
 export const metadata: Metadata = {
-  title: 'RateMyFeet - COMPETE...with YOUR FEET!',
-  description: 'Upload photos of feet and get rated by the community! Join our leaderboard and see how you rank.',
-  keywords: ['feet', 'rating', 'attractiveness', 'community', 'leaderboard', 'photo', 'rating', 'feet pics'],
-  authors: [{ name: 'RateMyFeet Team' }],
+  title: 'RateMyBeard - GET WEIRD...with YOUR BEARD!',
+  description: 'Upload photos of beards and get rated by the community! Join our leaderboard and see how you rank.',
+  keywords: ['beard', 'rating', 'attractiveness', 'community', 'leaderboard', 'photo', 'rating', 'facial hair', 'beard pics'],
+  authors: [{ name: 'RateMyBeard Team' }],
   verification: {
     // Add your Google site verification here once you get it from Google AdSense
     google: 'google-site-verification=YOUR_VERIFICATION_CODE',
@@ -115,7 +115,7 @@ export default function RootLayout({
         <Script id="confetti-animation" strategy="afterInteractive">
           {`
             // Check if this is the first visit
-            const hasVisited = localStorage.getItem('hasVisitedRateMyFeet');
+            const hasVisited = localStorage.getItem('hasVisitedRateMyBeard');
             
             // Function to trigger confetti
             function triggerConfetti() {
@@ -153,7 +153,7 @@ export default function RootLayout({
                 });
                 
                 // Set the flag in localStorage
-                localStorage.setItem('hasVisitedRateMyFeet', 'true');
+                localStorage.setItem('hasVisitedRateMyBeard', 'true');
                 
                 // Create a fireworks effect with confetti
                 setTimeout(() => {
