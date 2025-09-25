@@ -335,21 +335,23 @@ function HomeContent() {
             
             {/* Sister Site Link */}
             <div className="mt-4 text-center px-4">
-              <p className="text-sm sm:text-base text-white drop-shadow-lg font-medium mb-2">
-                Visit our sister site:
-              </p>
-              <a 
-                href="https://ratemyfeet.net?utm_source=ratemybeard"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block hover:scale-105 transition-transform duration-200"
-              >
-                <img 
-                  src="/images/ratemyfeet-logo.png" 
-                  alt="RateMyFeet Logo" 
-                  className="h-6 sm:h-8 md:h-10 mx-auto drop-shadow-lg hover:drop-shadow-xl transition-all duration-200"
-                />
-              </a>
+              <div className="flex items-center justify-center gap-3">
+                <p className="text-sm sm:text-base text-white drop-shadow-lg font-medium">
+                  Visit our sister site:
+                </p>
+                <a 
+                  href="https://ratemyfeet.net?utm_source=ratemybeard"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block hover:scale-105 transition-transform duration-200"
+                >
+                  <img 
+                    src="/images/ratemyfeet-logo.png" 
+                    alt="RateMyFeet Logo" 
+                    className="h-6 sm:h-8 md:h-10 drop-shadow-lg hover:drop-shadow-xl transition-all duration-200"
+                  />
+                </a>
+              </div>
             </div>
           </div>
 
