@@ -21,8 +21,8 @@ export function InlineRatingSlider({
   onRatingSubmit,
   className = "" 
 }: InlineRatingSliderProps) {
-  // Feature flag for discrete ratings - TEMPORARY HARDCODE TO TEST
-  const useDiscreteRatings = true;
+  // Feature flag for discrete ratings
+  const useDiscreteRatings = process.env.NEXT_PUBLIC_ENABLE_DISCRETE_RATINGS === 'true';
   
   // Legacy slider state
   const [rating, setRating] = useState<number[]>([5.0]);
