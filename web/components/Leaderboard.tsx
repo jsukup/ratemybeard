@@ -364,7 +364,7 @@ export default function Leaderboard({ submittedEntryId }: LeaderboardProps) {
                     </div>
                   )}
                   <div className="text-center">
-                    <div className="font-bold leading-tight">{config.label}</div>
+                    <div className="font-bold leading-tight whitespace-pre-line">{config.label}</div>
                     <div className="text-xs opacity-90 mt-0.5 md:mt-1 hidden sm:block">
                       {categoryImages.length} {categoryImages.length === 1 ? 'image' : 'images'}
                     </div>
