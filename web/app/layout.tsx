@@ -51,7 +51,6 @@ export default function RootLayout({
           id="google-adsense"
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8459009337119987"
           crossOrigin="anonymous"
-          strategy="beforeInteractive"
         />
         
         {/* Canvas Confetti library */}
