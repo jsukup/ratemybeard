@@ -46,6 +46,14 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="192x192" href="/icon-192x192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/icon-512x512.png" />
         
+        {/* Google AdSense */}
+        <Script
+          id="google-adsense"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8459009337119987"
+          crossOrigin="anonymous"
+          strategy="beforeInteractive"
+        />
+        
         {/* Canvas Confetti library */}
         <Script
           id="canvas-confetti"
