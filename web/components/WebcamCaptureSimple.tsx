@@ -162,12 +162,12 @@ export default function WebcamCaptureSimple({ onImageCapture, onImageUploaded, o
   // Device-specific camera constraints
   const videoConstraints = React.useMemo(() => {
     if (isMobile) {
-      // Mobile: Prefer rear camera for beard photography
+      // Mobile: Prefer front camera for beard selfies
       return {
         width: { ideal: 1280 },
         height: { ideal: 720 },
         aspectRatio: 16/9,
-        facingMode: { ideal: "environment" }
+        facingMode: { ideal: "user" }
       };
     } else {
       // Desktop: Use default camera (usually built-in webcam)
