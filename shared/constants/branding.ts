@@ -13,8 +13,8 @@ export const BRAND_CONFIG = {
   longDescription: 'A fun, community-driven platform where users can submit photos and rate beard attractiveness through user-generated scoring',
   
   // Contact Information
-  contactEmail: 'info@ratemybeard.net',
-  supportEmail: 'info@ratemybeard.net',
+  contactEmail: 'info@ratemyfeet.net',
+  supportEmail: 'info@ratemyfeet.net',
   
   // Asset Paths - Platform specific paths will be overridden
   assets: {

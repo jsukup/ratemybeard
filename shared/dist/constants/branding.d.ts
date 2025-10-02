@@ -9,8 +9,8 @@ export declare const BRAND_CONFIG: {
     readonly tagline: "GET WEIRD...with YOUR BEARD!";
     readonly shortDescription: "A lighthearted platform for rating beard attractiveness";
     readonly longDescription: "A fun, community-driven platform where users can submit photos and rate beard attractiveness through user-generated scoring";
-    readonly contactEmail: "info@ratemybeard.net";
-    readonly supportEmail: "info@ratemybeard.net";
+    readonly contactEmail: "info@ratemyfeet.net";
+    readonly supportEmail: "info@ratemyfeet.net";
     readonly assets: {
         readonly logo: {
             readonly main: "/images/ratemybeard-logo.png";
