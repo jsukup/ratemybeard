@@ -41,15 +41,13 @@ CREATE TABLE IF NOT EXISTS reports (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     image_id UUID NOT NULL REFERENCES images(id) ON DELETE CASCADE,
     session_id TEXT NOT NULL,
-    reason TEXT NOT NULL,
-    description TEXT,
+    report_reason TEXT NOT NULL CHECK (report_reason IN ('not_beard', 'inappropriate', 'spam_fake', 'other')),
+    report_details TEXT,
     ip_address INET,
-    user_agent TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
-    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'resolved', 'dismissed')),
-    admin_notes TEXT,
-    resolved_at TIMESTAMP WITH TIME ZONE,
-    resolved_by TEXT
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'dismissed')),
+    reviewed_at TIMESTAMP WITH TIME ZONE,
+    reviewed_by TEXT
 );
 
 -- =============================================================================
@@ -303,6 +301,13 @@ COMMENT ON COLUMN images.moderation_status IS 'Moderation status: pending, appro
 COMMENT ON COLUMN ratings.rating IS 'Rating value between 0.00 and 10.00 with 0.01 precision';
 COMMENT ON COLUMN ratings.session_id IS 'Session identifier to prevent duplicate ratings';
 COMMENT ON COLUMN ratings.ip_address IS 'IP address for rate limiting and analytics';
+
+-- Column comments for reports
+COMMENT ON COLUMN reports.report_reason IS 'Reason for report: not_beard, inappropriate, spam_fake, other';
+COMMENT ON COLUMN reports.report_details IS 'Optional additional details provided by reporter';
+COMMENT ON COLUMN reports.session_id IS 'Session identifier to prevent duplicate reports';
+COMMENT ON COLUMN reports.ip_address IS 'IP address for rate limiting and tracking';
+COMMENT ON COLUMN reports.status IS 'Report status: pending, reviewed, dismissed';
 
 -- Policy comments
 COMMENT ON POLICY "Allow all access to images" ON images IS 'Initial permissive policy - allows all operations to prevent breaking changes';
